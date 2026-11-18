@@ -1,0 +1,159 @@
+.figur {
+  margin: 0;
+}
+
+.diagramm {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.5rem;
+  height: 16rem;
+  margin-bottom: 2.25rem;
+}
+
+.achse {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--tinte-2);
+  transform: translateY(-0.5em);
+  height: calc(100% + 1em);
+  padding-block: 0;
+}
+
+.flaeche {
+  position: relative;
+  border-bottom: 2px solid var(--kontur);
+}
+
+.raster {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.raster span {
+  border-top: 1px solid var(--linie);
+}
+
+.raster span:last-child {
+  border-top: 0;
+}
+
+.balken {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  height: 100%;
+  display: grid;
+  gap: 2px;
+}
+
+.spalte {
+  position: relative;
+  height: 100%;
+}
+
+.treffer {
+  all: unset;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  cursor: default;
+}
+
+.treffer:focus-visible {
+  outline: 3px solid var(--kontur);
+  outline-offset: 2px;
+}
+
+.balkenWert {
+  display: block;
+  width: 100%;
+  min-height: 2px;
+  background: var(--rot-tief);
+  border-radius: 4px 4px 0 0;
+}
+
+.treffer:hover .balkenWert,
+.treffer:focus-visible .balkenWert {
+  background: var(--kontur);
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 0.25rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--kontur);
+  color: var(--weiss);
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.3rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  display: none;
+  flex-direction: column;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.treffer:hover .tooltip,
+.treffer:focus-visible .tooltip {
+  display: flex;
+}
+
+.jahr {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: var(--tinte-2);
+  white-space: nowrap;
+  display: none;
+}
+
+.jahrMobil {
+  display: block;
+}
+
+.jahrAnfang {
+  left: 0;
+  transform: none;
+}
+
+.jahrEnde {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+@media (min-width: 40rem) {
+  .jahr {
+    display: none;
+  }
+
+  .jahrDesktop {
+    display: block;
+  }
+}
+
+.tabelle {
+  margin-top: 1rem;
+}
+
+.tabelle summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tabelle table {
+  max-width: 20rem;
+  margin-top: 0.75rem;
+}

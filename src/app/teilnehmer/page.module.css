@@ -1,0 +1,89 @@
+.zahlen {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0 0;
+}
+
+.zahlen dt {
+  font-weight: 600;
+  color: var(--tinte-2);
+  font-size: 0.95rem;
+}
+
+.zahlen dd {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.abschnitt {
+  margin-top: 3rem;
+  max-width: 56rem;
+}
+
+.liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 3px solid var(--kontur);
+}
+
+.liste li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--linie);
+}
+
+.name {
+  font-weight: 600;
+}
+
+.anonym .name {
+  color: var(--tinte-2);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.zeit {
+  color: var(--tinte-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.rollen {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.rollen:empty {
+  display: none;
+}
+
+@media (min-width: 40rem) {
+  .zahlen {
+    display: flex;
+    gap: 1rem 3.5rem;
+  }
+
+  .zahlen dd {
+    font-size: 4rem;
+  }
+
+  .abschnitt {
+    margin-top: 4rem;
+  }
+
+  .liste li {
+    grid-template-columns: minmax(10rem, 1.4fr) minmax(6rem, 0.8fr) 2fr;
+  }
+
+  .rollen {
+    grid-column: auto;
+  }
+}

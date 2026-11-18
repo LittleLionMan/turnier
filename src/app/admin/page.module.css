@@ -1,0 +1,235 @@
+.abschnitt {
+  margin-top: 3.5rem;
+}
+
+.schmal {
+  max-width: var(--mass);
+}
+
+.zahlen {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 0 0 2rem;
+}
+
+.zahlen dt {
+  font-weight: 600;
+  color: var(--tinte-2);
+  font-size: 0.9rem;
+}
+
+.zahlen dd {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.verteilung {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 2rem;
+  max-width: 48rem;
+}
+
+.verteilung ul,
+.rollen {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.verteilung li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--linie);
+  font-variant-numeric: tabular-nums;
+}
+
+.kopfzeile {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--kontur);
+  font-weight: 600;
+}
+
+.filter a[aria-current="page"] {
+  text-decoration-thickness: 3px;
+  text-decoration-color: var(--rot);
+}
+
+.scroller {
+  overflow-x: auto;
+}
+
+.karten thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.karten,
+.karten tbody,
+.karten tr,
+.karten td {
+  display: block;
+}
+
+.karten tr {
+  border: 2px solid var(--linie);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.karten td {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.75rem;
+  border: 0;
+  padding: 0.3rem 0;
+  overflow-wrap: anywhere;
+}
+
+.karten td[data-label]::before {
+  content: attr(data-label);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--tinte-2);
+}
+
+.karten td.aktion {
+  display: block;
+  padding-top: 0.5rem;
+}
+
+@media (min-width: 64rem) {
+  .zahlen {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 3rem;
+  }
+
+  .karten {
+    display: table;
+  }
+
+  .karten thead {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    display: table-header-group;
+  }
+
+  .karten tbody {
+    display: table-row-group;
+  }
+
+  .karten tr {
+    display: table-row;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .karten td,
+  .karten td.aktion {
+    display: table-cell;
+    border-bottom: 1px solid var(--linie);
+    padding: 0.6rem 0.75rem;
+    overflow-wrap: normal;
+  }
+
+  .karten td[data-label]::before {
+    content: none;
+  }
+}
+
+.code {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.statusKnopf {
+  min-height: 36px;
+  padding-inline: 0.75rem;
+  cursor: pointer;
+  background: var(--weiss);
+  font-family: var(--text);
+}
+
+.statusKnopf:hover {
+  background: var(--flaeche);
+}
+
+.loeschen summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  cursor: pointer;
+  color: var(--rot-tief);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.loeschen form {
+  margin-top: 0.5rem;
+  min-width: 14rem;
+}
+
+.rollen {
+  margin-bottom: 2rem;
+  border-top: 3px solid var(--kontur);
+}
+
+.rollen li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--linie);
+}
+
+.rolleKopf {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.rolleBearbeiten summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 0.35rem;
+}
+
+.rolleBearbeiten form {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--flaeche);
+  border-radius: 0.4rem;
+}

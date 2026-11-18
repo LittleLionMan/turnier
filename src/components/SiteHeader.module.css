@@ -1,0 +1,90 @@
+.kopf {
+  border-bottom: 1px solid var(--linie);
+}
+
+.streifen {
+  height: 10px;
+  background: linear-gradient(var(--gelb) 0 50%, var(--rot) 50% 100%);
+}
+
+.leiste {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25rem;
+  padding-block: 0.6rem 0.4rem;
+}
+
+.marke {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 44px;
+  color: var(--kontur);
+  text-decoration: none;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.marke img {
+  width: 30px;
+  height: auto;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 0.25rem;
+  color: var(--kontur);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+.nav .aktion {
+  background: var(--kontur);
+  color: var(--weiss);
+  padding-inline: 1rem;
+  border-radius: 0.4rem;
+}
+
+.nav .aktion:hover {
+  background: var(--rot-tief);
+  color: var(--weiss);
+  text-decoration: none;
+}
+
+@media (min-width: 40rem) {
+  .leiste {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 0.75rem;
+  }
+
+  .marke {
+    font-size: 1.6rem;
+  }
+
+  .marke img {
+    width: 34px;
+  }
+
+  .nav {
+    justify-content: flex-end;
+    gap: 1.25rem;
+  }
+}

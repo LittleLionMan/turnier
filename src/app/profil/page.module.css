@@ -1,0 +1,76 @@
+.status {
+  border: 3px solid var(--kontur);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-block: 1.5rem;
+}
+
+.status :global(.knopf) {
+  width: 100%;
+}
+
+.status p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: baseline;
+}
+
+.dabei {
+  font-weight: 600;
+  margin: 0;
+}
+
+.zahlung {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+  padding: 1rem;
+  background: var(--gelb);
+  border-radius: 0.4rem;
+}
+
+.zahlung dt {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.zahlung dd {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.zahlung code {
+  font: inherit;
+}
+
+.zweck {
+  display: block;
+  flex-basis: 100%;
+}
+
+.block {
+  margin-top: 3rem;
+}
+
+.konto {
+  display: grid;
+  gap: 2.5rem;
+}
+
+@media (min-width: 40rem) {
+  .status {
+    padding: 1.5rem;
+    margin-block: 2rem;
+  }
+
+  .status :global(.knopf) {
+    width: auto;
+  }
+
+  .block {
+    margin-top: 4rem;
+  }
+}

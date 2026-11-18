@@ -1,0 +1,42 @@
+.fuss {
+  background: var(--kontur);
+  color: var(--weiss);
+  font-size: 0.9rem;
+}
+
+.innen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-block: 1.25rem;
+}
+
+.innen p {
+  margin: 0;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.25rem;
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--weiss);
+}
+
+.links a:hover {
+  color: var(--gelb);
+}
+
+@media (min-width: 40rem) {
+  .innen {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 1.5rem;
+  }
+}

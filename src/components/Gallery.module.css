@@ -1,0 +1,141 @@
+.galerie {
+  color: var(--weiss);
+}
+
+.buehne {
+  all: unset;
+  display: block;
+  position: relative;
+  aspect-ratio: 3 / 2;
+  max-height: 75vh;
+  width: 100%;
+  background: #000;
+  border-radius: 0.4rem;
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: zoom-in;
+}
+
+.buehne:focus-visible {
+  outline: 3px solid var(--gelb);
+  outline-offset: 3px;
+}
+
+.bild {
+  object-fit: contain;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.bild[data-sichtbar="true"] {
+  opacity: 1;
+}
+
+.lupe {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgb(39 31 36 / 0.8);
+  color: var(--weiss);
+  font: 600 0.85rem/1 var(--text);
+  pointer-events: none;
+}
+
+.leiste {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 0.75rem;
+}
+
+.unterschrift {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1;
+}
+
+.steuerung {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.steuerung button {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 2px solid var(--weiss);
+  background: transparent;
+  color: var(--weiss);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.steuerung button:hover {
+  background: var(--gelb);
+  border-color: var(--gelb);
+  color: var(--kontur);
+}
+
+.steuerung button:focus-visible {
+  outline: 3px solid var(--gelb);
+  outline-offset: 2px;
+}
+
+.zaehler {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+}
+
+.vollbild {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #000;
+  color: var(--weiss);
+}
+
+.vollbild[open] {
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.vollbild::backdrop {
+  background: #000;
+}
+
+.vollbildBild {
+  position: relative;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.vollbildBild img {
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.vollbildLeiste {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
+}
+
+.schliessen {
+  font-size: 1.2rem;
+}

@@ -1,0 +1,440 @@
+@import "@fontsource/bebas-neue/400.css";
+@import "@fontsource-variable/inter/index.css";
+
+:root {
+  --gelb: #ffd400;
+  --rot: #ed1d26;
+  --rot-tief: #c8141c;
+  --weiss: #ffffff;
+  --kontur: #271f24;
+  --tinte-2: #5b5157;
+  --linie: #e4dfe2;
+  --flaeche: #f6f4f5;
+  --gruen: #1d7a46;
+  --display: "Bebas Neue", "Arial Narrow", sans-serif;
+  --text: "Inter Variable", system-ui, sans-serif;
+  --mass: 42rem;
+  --breit: 68rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--weiss);
+  color: var(--kontur);
+  font-family: var(--text);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.5em;
+}
+
+h1 {
+  font-size: clamp(2.75rem, 7vw, 4.5rem);
+}
+
+h2 {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+}
+
+h3 {
+  font-size: 1.6rem;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+a {
+  color: var(--rot-tief);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--kontur);
+}
+
+:focus-visible {
+  outline: 3px solid var(--kontur);
+  outline-offset: 2px;
+}
+
+.wrap {
+  width: min(100% - 2.5rem, var(--breit));
+  margin-inline: auto;
+}
+
+.wrap-schmal {
+  width: min(100% - 2.5rem, var(--mass));
+  margin-inline: auto;
+}
+
+.seite {
+  padding-block: 2rem 3.5rem;
+}
+
+.lead {
+  font-size: 1.2rem;
+  color: var(--tinte-2);
+  max-width: 38rem;
+}
+
+.leise {
+  color: var(--tinte-2);
+  font-size: 0.95rem;
+}
+
+.knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid var(--kontur);
+  background: var(--rot-tief);
+  border-color: var(--rot-tief);
+  color: var(--weiss);
+  font: 600 1rem/1 var(--text);
+  padding: 0.9rem 1.4rem;
+  border-radius: 0.4rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.knopf:hover {
+  background: var(--kontur);
+  border-color: var(--kontur);
+  color: var(--weiss);
+}
+
+.knopf[disabled] {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.knopf-zweit {
+  background: transparent;
+  color: var(--kontur);
+  border-color: var(--kontur);
+}
+
+.knopf-zweit:hover {
+  background: var(--kontur);
+  color: var(--weiss);
+}
+
+.knopf-klein {
+  min-height: 40px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.knopf-gefahr {
+  background: transparent;
+  color: var(--rot-tief);
+  border-color: var(--rot-tief);
+}
+
+.knopf-gefahr:hover {
+  background: var(--rot-tief);
+  color: var(--weiss);
+  border-color: var(--rot-tief);
+}
+
+.hinweis {
+  border-left: 4px solid var(--gelb);
+  background: var(--flaeche);
+  padding: 1rem 1.25rem;
+  margin-block: 1.5rem;
+}
+
+.hinweis-fehler {
+  border-left-color: var(--rot);
+}
+
+.hinweis-ok {
+  border-left-color: var(--gruen);
+}
+
+.hinweis > :last-child {
+  margin-bottom: 0;
+}
+
+.formular {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.teil {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.teil > legend {
+  font-family: var(--display);
+  font-size: 2rem;
+  line-height: 1;
+  padding: 0;
+  margin-bottom: 0.25rem;
+  width: 100%;
+  border-bottom: 3px solid var(--kontur);
+  padding-bottom: 0.4rem;
+}
+
+.teil-optional {
+  border: 2px solid var(--linie);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.teil-optional > legend {
+  border-bottom: 0;
+  width: auto;
+  padding: 0 0.5rem;
+  margin-left: -0.5rem;
+  font-size: 1.75rem;
+}
+
+.teil-optional[data-aktiv="true"] {
+  border-color: var(--kontur);
+}
+
+.feld {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.feld label,
+.feld .label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.feld input[type="text"],
+.feld input[type="email"],
+.feld input[type="password"],
+.feld input[type="number"],
+.feld input[type="date"],
+.feld input[type="url"],
+.feld input[type="time"],
+.feld select {
+  font: inherit;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 2px solid var(--linie);
+  border-radius: 0.4rem;
+  background: var(--weiss);
+  color: var(--kontur);
+}
+
+.feld input:focus-visible,
+.feld select:focus-visible {
+  outline: none;
+  border-color: var(--kontur);
+  box-shadow: 0 0 0 3px var(--gelb);
+}
+
+.feld select:disabled {
+  background: var(--flaeche);
+  color: var(--tinte-2);
+  cursor: not-allowed;
+}
+
+.feld [aria-invalid="true"] {
+  border-color: var(--rot);
+}
+
+.feld-fehler {
+  color: var(--rot-tief);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.feld-hilfe {
+  color: var(--tinte-2);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.zeile {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.haken {
+  display: grid;
+  grid-template-columns: 1.375rem 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  padding-block: 0.25rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.haken input {
+  width: 1.375rem;
+  height: 1.375rem;
+  margin: 0.15rem 0 0;
+  accent-color: var(--rot-tief);
+}
+
+.haken-gross {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.positionen {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.positionen .haken {
+  border: 2px solid var(--linie);
+  border-radius: 0.4rem;
+  padding: 0.7rem 0.75rem;
+  min-height: 48px;
+  align-items: center;
+}
+
+.positionen .haken input {
+  margin-top: 0;
+}
+
+.positionen .haken:has(input:checked) {
+  border-color: var(--kontur);
+  background: var(--gelb);
+}
+
+.honig {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tabelle th,
+.tabelle td {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--linie);
+  vertical-align: top;
+}
+
+.tabelle th {
+  font-size: 0.85rem;
+  color: var(--tinte-2);
+  font-weight: 600;
+}
+
+.marke {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--kontur);
+  white-space: nowrap;
+}
+
+.marke-gelb {
+  background: var(--gelb);
+}
+
+.marke-gruen {
+  border-color: var(--gruen);
+  color: var(--gruen);
+}
+
+.marke-offen {
+  border-color: var(--rot-tief);
+  color: var(--rot-tief);
+}
+
+.formular .knopf[type="submit"],
+.teil .knopf[type="submit"] {
+  width: 100%;
+}
+
+@media (min-width: 40rem) {
+  .seite {
+    padding-block: 3rem 5rem;
+  }
+
+  .teil-optional {
+    padding: 1.25rem;
+  }
+
+  .formular .knopf[type="submit"],
+  .teil .knopf[type="submit"] {
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.rollen-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.rollen-info:empty {
+  display: none;
+}
+
+.haken:has(input:disabled) {
+  cursor: not-allowed;
+  color: var(--tinte-2);
+}
