@@ -342,6 +342,21 @@ a:hover {
   background: var(--gelb);
 }
 
+.person {
+  display: grid;
+  gap: 1rem;
+}
+
+.person + .person {
+  border-top: 1px solid var(--linie);
+  padding-top: 1rem;
+}
+
+.person-titel {
+  margin: 0;
+  font-weight: 700;
+}
+
 .honig {
   position: absolute;
   left: -10000px;

@@ -1,5 +1,14 @@
 import { z } from "zod";
-import { DRINK_OPTIONS, EARLIEST_ACTIVE_YEAR, FOOD_OPTIONS, GENDER_OPTIONS, POSITIONS } from "./constants";
+import type { FoodChoice, GuestPreferences } from "@/db/schema";
+import {
+  DrinkChoice,
+  DRINK_OPTIONS,
+  EARLIEST_ACTIVE_YEAR,
+  FOOD_OPTIONS,
+  GENDER_OPTIONS,
+  MAX_GUESTS_PER_GROUP,
+  POSITIONS,
+} from "./constants";
 
 const checkbox = z
   .string()
@@ -30,6 +39,20 @@ const optionalYear = z
       return z.NEVER;
     }
     return year;
+  });
+
+const guestCount = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value, ctx) => {
+    if (!value) return 0;
+    const count = Number(value);
+    if (!Number.isInteger(count) || count < 0 || count > MAX_GUESTS_PER_GROUP) {
+      ctx.addIssue({ code: "custom", message: `Bitte eine Zahl zwischen 0 und ${MAX_GUESTS_PER_GROUP}.` });
+      return z.NEVER;
+    }
+    return count;
   });
 
 const genderValues = GENDER_OPTIONS.map((option) => option.value) as [
@@ -68,6 +91,8 @@ export const participationSchema = z
       .optional()
       .transform((value) => value ?? null),
     drinkChoices: z.array(z.enum(drinkValues)).default([]),
+    guestAdults: guestCount,
+    guestChildren: guestCount,
   })
   .superRefine((data, ctx) => {
     if (data.activeTo !== null && data.activeFrom === null) {
@@ -128,7 +153,7 @@ export type FormState = {
   values?: RawFormValues;
 };
 
-const MULTI_VALUE_FIELDS = new Set(["positions", "helperRoleIds", "drinkChoices"]);
+const MULTI_VALUE_FIELDS = new Set(["positions", "helperRoleIds", "drinkChoices", "guestDrinks"]);
 const SECRET_FIELDS = new Set(["password", "passwordConfirm", "currentPassword", "newPassword", "newPasswordConfirm"]);
 
 export function readForm(formData: FormData): RawFormValues {
@@ -152,4 +177,65 @@ export function errorState(error: z.ZodError, values: RawFormValues): FormState 
     fieldErrors: z.flattenError(error).fieldErrors,
     values: withoutSecrets(values),
   };
+}
+
+function isFoodChoice(value: string): value is FoodChoice {
+  return FOOD_OPTIONS.some((option) => option.value === value);
+}
+
+function isDrinkChoice(value: string): value is DrinkChoice {
+  return DRINK_OPTIONS.some((option) => option.value === value);
+}
+
+function single(values: RawFormValues, key: string): string {
+  const value = values[key];
+  return typeof value === "string" ? value : "";
+}
+
+export function adultFoodField(index: number): string {
+  return `guestAdultFood_${index}`;
+}
+
+export function childFoodField(index: number): string {
+  return `guestChildFood_${index}`;
+}
+
+export function guestDrinkValue(index: number, drink: DrinkChoice): string {
+  return `${index}:${drink}`;
+}
+
+export function readGuestPreferences(values: RawFormValues, adults: number, children: number): GuestPreferences {
+  const drinkEntries = Array.isArray(values.guestDrinks) ? values.guestDrinks : [];
+  const food = (key: string) => {
+    const value = single(values, key);
+    return isFoodChoice(value) ? value : null;
+  };
+
+  return {
+    adults: Array.from({ length: adults }, (_, index) => ({
+      food: food(adultFoodField(index)),
+      drinks: [
+        ...new Set(
+          drinkEntries
+            .filter((entry) => entry.startsWith(`${index}:`))
+            .map((entry) => entry.slice(entry.indexOf(":") + 1))
+            .filter(isDrinkChoice),
+        ),
+      ],
+    })),
+    children: Array.from({ length: children }, (_, index) => ({ food: food(childFoodField(index)) })),
+  };
+}
+
+export function guestPreferencesToForm(preferences: GuestPreferences): RawFormValues {
+  const values: RawFormValues = {
+    guestDrinks: preferences.adults.flatMap((guest, index) => guest.drinks.map((drink) => guestDrinkValue(index, drink))),
+  };
+  preferences.adults.forEach((guest, index) => {
+    values[adultFoodField(index)] = guest.food ?? "";
+  });
+  preferences.children.forEach((guest, index) => {
+    values[childFoodField(index)] = guest.food ?? "";
+  });
+  return values;
 }

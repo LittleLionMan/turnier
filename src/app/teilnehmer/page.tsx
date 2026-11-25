@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { YearChart } from "@/components/YearChart";
 import { displayName, formatYearRanges, getCurrentEvent } from "@/lib/event";
-import { activeYearDistribution, listRegistrations, peakPeriods } from "@/lib/registrations";
+import { activeYearDistribution, headcount, listRegistrations, peakPeriods } from "@/lib/registrations";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = { title: "Wer ist dabei?" };
@@ -30,6 +30,7 @@ export default async function ParticipantsPage() {
   const distribution = activeYearDistribution(entries, currentYear);
   const players = entries.filter((entry) => entry.playsTournament).length;
   const helpers = entries.filter((entry) => entry.helperRoleIds.length > 0).length;
+  const people = entries.reduce((sum, entry) => sum + headcount(entry), 0);
   const peak = peakPeriods(distribution);
   const newestFirst = [...entries].reverse();
 
@@ -41,6 +42,10 @@ export default async function ParticipantsPage() {
         <div>
           <dt>Angemeldet</dt>
           <dd>{entries.length}</dd>
+        </div>
+        <div>
+          <dt>Mit Begleitung</dt>
+          <dd>{people}</dd>
         </div>
         <div>
           <dt>Spielen mit</dt>
@@ -76,6 +81,9 @@ export default async function ParticipantsPage() {
                 </span>
                 <span className={styles.rollen}>
                   {entry.playsTournament && <span className="marke marke-gelb">spielt mit</span>}
+                  {entry.guestAdults + entry.guestChildren > 0 && (
+                    <span className="marke">+{entry.guestAdults + entry.guestChildren} Begleitung</span>
+                  )}
                   {entry.helperRoleLabels.map((label) => (
                     <span key={label} className="marke">
                       {label}

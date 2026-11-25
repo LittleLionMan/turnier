@@ -13,9 +13,10 @@ const initialState: FormState = { status: "idle" };
 type RegisterFormProps = {
   helperRoles: HelperRoleOption[];
   genderEnabled: boolean;
+  guestFee: string | null;
 };
 
-export function RegisterForm({ helperRoles, genderEnabled }: RegisterFormProps) {
+export function RegisterForm({ helperRoles, genderEnabled, guestFee }: RegisterFormProps) {
   const [state, formAction] = useActionState(registerAction, initialState);
   const errors = state.fieldErrors;
 
@@ -29,6 +30,7 @@ export function RegisterForm({ helperRoles, genderEnabled }: RegisterFormProps) 
         helperRoles={helperRoles}
         genderEnabled={genderEnabled}
         tournamentLocked={false}
+        guestFee={guestFee}
       />
 
       <fieldset className="teil">

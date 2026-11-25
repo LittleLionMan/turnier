@@ -18,6 +18,7 @@ type ParticipationFormProps = {
   genderEnabled: boolean;
   tournamentLocked: boolean;
   isNew: boolean;
+  guestFee: string | null;
 };
 
 export function ParticipationForm({
@@ -26,6 +27,7 @@ export function ParticipationForm({
   genderEnabled,
   tournamentLocked,
   isNew,
+  guestFee,
 }: ParticipationFormProps) {
   const [state, formAction] = useActionState(updateParticipationAction, {
     status: "idle",
@@ -40,6 +42,7 @@ export function ParticipationForm({
         helperRoles={helperRoles}
         genderEnabled={genderEnabled}
         tournamentLocked={tournamentLocked}
+        guestFee={guestFee}
       />
       <FormMessage state={state} />
       <div>

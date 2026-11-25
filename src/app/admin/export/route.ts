@@ -1,6 +1,6 @@
-import { drinkLabel, effectiveDrinks, effectiveFood, foodLabel } from "@/lib/evening";
-import { getCurrentEvent, paymentCode } from "@/lib/event";
-import { listRegistrations } from "@/lib/registrations";
+import { drinkLabel, effectiveDrinks, effectiveFood, foodLabel, guestPreferenceSummary } from "@/lib/evening";
+import { formatFee, getCurrentEvent, paymentCode } from "@/lib/event";
+import { amountDue, listRegistrations } from "@/lib/registrations";
 import { getSessionUser, isAdminEmail } from "@/lib/session";
 
 function csvCell(value: string | number | boolean | null): string {
@@ -32,6 +32,10 @@ export async function GET(): Promise<Response> {
     "Helferrollen",
     "Essen",
     "Getränke",
+    "Begleitung Erwachsene",
+    "Begleitung Kinder",
+    "Begleitung Essen & Getränke",
+    "Betrag",
     "Bezahlstatus",
     "Bezahlt am",
     "Angemeldet am",
@@ -49,8 +53,12 @@ export async function GET(): Promise<Response> {
     entry.gender,
     entry.insuranceAccepted,
     entry.helperRoleLabels.join(", "),
-    `${foodLabel(effectiveFood(entry))}${entry.foodChoice === null ? " (Standard)" : ""}`,
-    `${effectiveDrinks(entry).map(drinkLabel).join(", ")}${entry.drinkChoices.length === 0 ? " (Standard)" : ""}`,
+    `${foodLabel(effectiveFood(entry.foodChoice))}${entry.foodChoice === null ? " (Standard)" : ""}`,
+    `${effectiveDrinks(entry.drinkChoices).map(drinkLabel).join(", ")}${entry.drinkChoices.length === 0 ? " (Standard)" : ""}`,
+    entry.guestAdults,
+    entry.guestChildren,
+    guestPreferenceSummary(entry),
+    formatFee(amountDue(eventRow.feeCents, entry).totalCents),
     entry.paymentState,
     entry.paidAt?.toISOString() ?? null,
     entry.createdAt.toISOString(),

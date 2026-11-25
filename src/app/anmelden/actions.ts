@@ -23,6 +23,7 @@ import {
   findRegistrationForUser,
   HelperRoleFullError,
   saveParticipation,
+  amountDue,
   type RegistrationDetails,
 } from "@/lib/registrations";
 import {
@@ -30,6 +31,7 @@ import {
   errorState,
   participationSchema,
   readForm,
+  readGuestPreferences,
   withoutSecrets,
   type FormState,
 } from "@/lib/validation";
@@ -40,11 +42,22 @@ function paymentMailLines(eventRow: EventRow, entry: RegistrationDetails): strin
     return [exemptionSentence(entry.exemptingRoleLabels)];
   }
   if (!isPaymentActive(eventRow)) return [FEE_PENDING_NOTE];
-  return [
-    `Teilnahmebeitrag: ${formatFee(eventRow.feeCents)}`,
+
+  const amount = amountDue(eventRow.feeCents, entry);
+  const lines = [
+    `Betrag: ${formatFee(amount.totalCents)}`,
     `Dein Verwendungszweck: ${paymentCode(entry.id)}`,
-    "Wie du bezahlst, steht in deinem Profil. Verbindlich dabei bist du, sobald dein Beitrag eingegangen ist.",
   ];
+  if (entry.guestAdults > 0) {
+    const guests = entry.guestAdults === 1 ? "eine erwachsene Begleitung" : `${entry.guestAdults} erwachsene Begleitpersonen`;
+    lines.push(
+      entry.selfExempt
+        ? `${exemptionSentence(entry.exemptingRoleLabels)} Der Betrag gilt für ${guests}.`
+        : `Der Betrag enthält deinen Beitrag und den für ${guests}.`,
+    );
+  }
+  lines.push("Wie du bezahlst, steht in deinem Profil. Verbindlich dabei bist du, sobald dein Beitrag eingegangen ist.");
+  return lines;
 }
 
 export async function registerAction(_previous: FormState, formData: FormData): Promise<FormState> {
@@ -100,7 +113,12 @@ export async function registerAction(_previous: FormState, formData: FormData): 
   }
 
   try {
-    await saveParticipation(eventRow, userId, participation.data);
+    await saveParticipation(
+      eventRow,
+      userId,
+      participation.data,
+      readGuestPreferences(values, participation.data.guestAdults, participation.data.guestChildren),
+    );
   } catch (error) {
     await db.delete(user).where(eq(user.id, userId));
     if (error instanceof HelperRoleFullError) {
@@ -140,7 +158,7 @@ export async function registerAction(_previous: FormState, formData: FormData): 
         `Deine Angaben kannst du jederzeit in deinem Profil ändern: ${appUrl("/profil")}`,
         "",
         "Sportliche Grüße",
-        "SC Münster 08 Handball",
+        "Das Orga-Team",
       ].join("\n"),
     });
   } catch (error) {

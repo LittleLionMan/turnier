@@ -1,0 +1,73 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+}
+
+.stepper + .stepper {
+  border-top: 1px solid var(--linie);
+}
+
+.text {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.steuerung {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.steuerung button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--kontur);
+  background: var(--weiss);
+  color: var(--kontur);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.steuerung button:hover:not(:disabled) {
+  background: var(--gelb);
+}
+
+.steuerung button:disabled {
+  border-color: var(--linie);
+  color: var(--linie);
+  cursor: default;
+}
+
+.steuerung input {
+  width: 3rem;
+  height: 44px;
+  text-align: center;
+  font: 700 1.2rem/1 var(--text);
+  border: 2px solid var(--linie);
+  border-radius: 0.4rem;
+  color: var(--kontur);
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.steuerung input::-webkit-outer-spin-button,
+.steuerung input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.steuerung input:focus-visible {
+  outline: none;
+  border-color: var(--kontur);
+  box-shadow: 0 0 0 3px var(--gelb);
+}

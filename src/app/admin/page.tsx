@@ -4,7 +4,7 @@ import { POSITIONS } from "@/lib/constants";
 import { eveningSummary, type ShoppingLine } from "@/lib/evening";
 import { formatFee, fullName, getCurrentEvent, getHelperRoles, paymentCode } from "@/lib/event";
 import { listPhotos } from "@/lib/photos";
-import { listRegistrations, type PaymentState } from "@/lib/registrations";
+import { amountDue, headcount, listRegistrations, type PaymentState } from "@/lib/registrations";
 import { requireAdmin } from "@/lib/session";
 import { deleteRegistrationAction, setHelperRoleActiveAction, setPaymentStatusAction } from "./actions";
 import { AddHelperRoleForm, EditHelperRoleForm, EventSettingsForm } from "./AdminForms";
@@ -22,7 +22,23 @@ const FILTER_LABELS: Record<Filter, string> = {
   befreit: "Beitragsfrei",
 };
 
-function ShoppingList({ title, lines }: { title: string; lines: ShoppingLine[] }) {
+function lineDetail(line: ShoppingLine): string | null {
+  const parts = [
+    line.viaDefault > 0 ? `${line.viaDefault} ohne Angabe` : null,
+    line.viaGuests > 0 ? `${line.viaGuests} Begleitung` : null,
+  ].filter((part) => part !== null);
+  return parts.length > 0 ? ` (davon ${parts.join(", ")})` : null;
+}
+
+type ShoppingListProps = {
+  title: string;
+  lines: ShoppingLine[];
+  childrenLabel: string;
+  childCount: number;
+  childDetail?: string;
+};
+
+function ShoppingList({ title, lines, childrenLabel, childCount, childDetail }: ShoppingListProps) {
   return (
     <div>
       <h3>{title}</h3>
@@ -31,14 +47,29 @@ function ShoppingList({ title, lines }: { title: string; lines: ShoppingLine[] }
           <li key={line.value}>
             <span>
               {line.label}
-              {line.viaDefault > 0 && <span className="leise"> (davon {line.viaDefault} ohne Angabe)</span>}
+              <span className="leise">{lineDetail(line)}</span>
             </span>
             <span>{line.count}</span>
           </li>
         ))}
+        {childCount > 0 && (
+          <li>
+            <span>
+              {childrenLabel}
+              {childDetail && <span className="leise"> ({childDetail})</span>}
+            </span>
+            <span>{childCount}</span>
+          </li>
+        )}
       </ul>
     </div>
   );
+}
+
+function guestSummary(adults: number, children: number): string {
+  const parts = [adults > 0 ? `${adults} Erw.` : null, children > 0 ? `${children} ${children === 1 ? "Kind" : "Kinder"}` : null];
+  const text = parts.filter((part) => part !== null).join(", ");
+  return text || "–";
 }
 
 type AdminPageProps = {
@@ -64,6 +95,8 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const visible = filter === "alle" ? entries : entries.filter((entry) => entry.paymentState === filter);
   const players = entries.filter((entry) => entry.playsTournament);
   const evening = eveningSummary(entries);
+  const totalPeople = entries.reduce((sum, entry) => sum + headcount(entry), 0);
+  const collectedCents = paid.reduce((sum, entry) => sum + amountDue(eventRow.feeCents, entry).totalCents, 0);
 
   return (
     <div className="wrap seite">
@@ -75,6 +108,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           <div>
             <dt>Anmeldungen</dt>
             <dd>{entries.length}</dd>
+          </div>
+          <div>
+            <dt>Personen mit Begleitung</dt>
+            <dd>{totalPeople}</dd>
           </div>
           <div>
             <dt>Bezahlt</dt>
@@ -90,7 +127,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </div>
           <div>
             <dt>Eingenommen</dt>
-            <dd>{formatFee(paid.length * eventRow.feeCents)}</dd>
+            <dd>{formatFee(collectedCents)}</dd>
           </div>
         </dl>
         <div className={styles.verteilung}>
@@ -122,12 +159,23 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       <section className={styles.abschnitt} aria-labelledby="abend-titel">
         <h2 id="abend-titel">Einkaufsliste für den Abend</h2>
         <p className="leise">
-          Personen pro Wunsch. Wer nichts angegeben hat, zählt als Fleisch und Bier. Bei Getränken sind Mehrfachnennungen
-          möglich.
+          Erwachsene pro Wunsch, Begleitung eingeschlossen. Ohne Angabe zählt Fleisch und Bier, bei Kindern Fleisch.
+          Bei Getränken sind Mehrfachnennungen möglich.
         </p>
         <div className={styles.verteilung}>
-          <ShoppingList title="Essen" lines={evening.food} />
-          <ShoppingList title="Getränke" lines={evening.drinks} />
+          <ShoppingList
+            title="Essen"
+            lines={evening.food}
+            childrenLabel="Kinderportionen"
+            childCount={evening.children.total}
+            childDetail={evening.children.byFood.map((line) => `${line.count} ${line.label}`).join(", ")}
+          />
+          <ShoppingList
+            title="Getränke"
+            lines={evening.drinks}
+            childrenLabel="Kinder (alkoholfrei)"
+            childCount={evening.children.total}
+          />
         </div>
       </section>
 
@@ -159,6 +207,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 <th scope="col">Aktiv</th>
                 <th scope="col">Turnier</th>
                 <th scope="col">Hilft als</th>
+                <th scope="col">Begleitung</th>
                 <th scope="col">Angemeldet</th>
                 <th scope="col">Beitrag</th>
                 <th scope="col">
@@ -183,6 +232,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                   </td>
                   <td data-label="Turnier">{entry.playsTournament ? entry.positions.join(", ") : "–"}</td>
                   <td data-label="Hilft als">{entry.helperRoleLabels.join(", ") || "–"}</td>
+                  <td data-label="Begleitung">{guestSummary(entry.guestAdults, entry.guestChildren)}</td>
                   <td data-label="Angemeldet">{dateFormat.format(entry.createdAt)}</td>
                   <td data-label="Beitrag">
                     {entry.paymentState === "befreit" ? (
@@ -196,7 +246,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                           className={`marke ${entry.paymentState === "bezahlt" ? "marke-gruen" : "marke-offen"} ${styles.statusKnopf}`}
                           title={entry.paymentState === "bezahlt" ? "Wieder auf offen setzen" : "Als bezahlt markieren"}
                         >
-                          {entry.paymentState === "bezahlt" ? "Bezahlt" : "Offen – als bezahlt markieren"}
+                          {entry.paymentState === "bezahlt"
+                            ? `Bezahlt (${formatFee(amountDue(eventRow.feeCents, entry).totalCents)})`
+                            : `Offen: ${formatFee(amountDue(eventRow.feeCents, entry).totalCents)} – als bezahlt markieren`}
                         </button>
                       </form>
                     )}

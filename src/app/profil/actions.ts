@@ -18,6 +18,7 @@ import {
   participationSchema,
   passwordChangeSchema,
   readForm,
+  readGuestPreferences,
   type FormState,
 } from "@/lib/validation";
 
@@ -39,7 +40,12 @@ export async function updateParticipationAction(_previous: FormState, formData: 
   }
 
   try {
-    await saveParticipation(eventRow, sessionUser.id, parsed.data);
+    await saveParticipation(
+          eventRow,
+          sessionUser.id,
+          parsed.data,
+          readGuestPreferences(values, parsed.data.guestAdults, parsed.data.guestChildren),
+        );
   } catch (error) {
     if (error instanceof HelperRoleFullError) {
       return {

@@ -111,7 +111,8 @@ export default async function Home() {
         <div className={styles.wegeRaster}>
           <div>
             <h3>Einfach vorbeikommen</h3>
-            <p>Alte Gesichter wiedersehen, zuschauen, quatschen. Dafür reicht die Anmeldung mit Vornamen.</p>
+            <p>Alte Gesichter wiedersehen, zuschauen, quatschen. Dafür reicht die Anmeldung mit Vornamen. Partner und
+                          Kinder gibst du dabei einfach mit an.</p>
           </div>
           <div>
             <h3>Mitspielen</h3>

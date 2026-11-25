@@ -46,7 +46,11 @@ export default async function RegisterPage() {
         {deadline ? `Anmeldeschluss ist ${formatDate(deadline)}. ` : ""}
         Schon angemeldet? <Link href="/login">Hier einloggen</Link>.
       </p>
-      <RegisterForm helperRoles={helperRoles} genderEnabled={eventRow.genderEnabled} />
+      <RegisterForm
+        helperRoles={helperRoles}
+        genderEnabled={eventRow.genderEnabled}
+        guestFee={isPaymentActive(eventRow) ? formatFee(eventRow.feeCents) : null}
+      />
     </div>
   );
 }

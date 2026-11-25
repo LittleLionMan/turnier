@@ -40,3 +40,5 @@ export const DEFAULT_DRINKS: DrinkChoice[] = ["bier"];
 export const REGISTRATION_DEADLINE_DAYS = 14;
 export const EARLIEST_ACTIVE_YEAR = 1950;
 export const TIME_ZONE = "Europe/Berlin";
+
+export const MAX_GUESTS_PER_GROUP = 10;

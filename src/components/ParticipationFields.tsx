@@ -1,10 +1,61 @@
 "use client";
 
 import { useState } from "react";
-import { DRINK_OPTIONS, FOOD_OPTIONS, GENDER_OPTIONS, POSITIONS } from "@/lib/constants";
+import { DRINK_OPTIONS, FOOD_OPTIONS, GENDER_OPTIONS, MAX_GUESTS_PER_GROUP, POSITIONS } from "@/lib/constants";
 import type { HelperRoleOption } from "@/lib/helper-roles";
-import type { FieldErrors, RawFormValues } from "@/lib/validation";
+import {
+  adultFoodField,
+  childFoodField,
+  guestDrinkValue,
+  type FieldErrors,
+  type RawFormValues,
+} from "@/lib/validation";
+import { CountStepper } from "./CountStepper";
 import { checked, FieldError, invalidProps, listValue, textValue } from "./form-bits";
+
+type FoodTilesProps = {
+  name: string;
+  labelId: string;
+  chosen: string;
+};
+
+function FoodTiles({ name, labelId, chosen }: FoodTilesProps) {
+  return (
+    <div className="kacheln" role="radiogroup" aria-labelledby={labelId}>
+      {FOOD_OPTIONS.map((option) => (
+        <label key={option.value} className="haken">
+          <input type="radio" name={name} value={option.value} defaultChecked={chosen === option.value} />
+          <span>{option.label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
+type DrinkTilesProps = {
+  name: string;
+  labelId: string;
+  valueFor: (drink: (typeof DRINK_OPTIONS)[number]["value"]) => string;
+  chosen: string[];
+};
+
+function DrinkTiles({ name, labelId, valueFor, chosen }: DrinkTilesProps) {
+  return (
+    <div className="kacheln" role="group" aria-labelledby={labelId}>
+      {DRINK_OPTIONS.map((option) => (
+        <label key={option.value} className="haken">
+          <input
+            type="checkbox"
+            name={name}
+            value={valueFor(option.value)}
+            defaultChecked={chosen.includes(valueFor(option.value))}
+          />
+          <span>{option.label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
 
 type ParticipationFieldsProps = {
   values: RawFormValues | undefined;
@@ -12,6 +63,7 @@ type ParticipationFieldsProps = {
   helperRoles: HelperRoleOption[];
   genderEnabled: boolean;
   tournamentLocked: boolean;
+  guestFee: string | null;
 };
 
 export function ParticipationFields({
@@ -20,12 +72,16 @@ export function ParticipationFields({
   helperRoles,
   genderEnabled,
   tournamentLocked,
+  guestFee,
 }: ParticipationFieldsProps) {
   const [plays, setPlays] = useState(checked(values, "playsTournament"));
   const chosenPositions = listValue(values, "positions");
   const chosenRoles = listValue(values, "helperRoleIds");
   const chosenFood = textValue(values, "foodChoice");
   const chosenDrinks = listValue(values, "drinkChoices");
+  const [guestAdults, setGuestAdults] = useState(Number(textValue(values, "guestAdults")) || 0);
+  const [guestChildren, setGuestChildren] = useState(Number(textValue(values, "guestChildren")) || 0);
+  const chosenGuestDrinks = listValue(values, "guestDrinks");
   const currentYear = new Date().getFullYear();
 
   return (
@@ -109,48 +165,98 @@ export function ParticipationFields({
         </label>
       </fieldset>
 
+      <fieldset className="teil teil-optional" data-aktiv={guestAdults + guestChildren > 0}>
+        <legend>Bringst du jemanden mit?</legend>
+        <p className="feld-hilfe">
+          Hier geht es nur um Begleitung, die zuschaut und mitfeiert. Wer mitspielen oder helfen will, zum Beispiel als
+          Schiedsrichter, meldet sich bitte selbst an.
+        </p>
+        <div>
+          <CountStepper
+            name="guestAdults"
+            label="Erwachsene"
+            hint={guestFee ? `Du zahlst je ${guestFee} mit` : "Du zahlst den Teilnahmebeitrag mit"}
+            value={guestAdults}
+            max={MAX_GUESTS_PER_GROUP}
+            onChange={setGuestAdults}
+          />
+          <CountStepper
+            name="guestChildren"
+            label="Kinder"
+            hint="Kostenlos"
+            value={guestChildren}
+            max={MAX_GUESTS_PER_GROUP}
+            onChange={setGuestChildren}
+          />
+        </div>
+        <FieldError errors={errors} name="guestAdults" />
+        <FieldError errors={errors} name="guestChildren" />
+      </fieldset>
+
       <fieldset className="teil teil-optional" data-aktiv={chosenFood !== "" || chosenDrinks.length > 0}>
         <legend>Für den Abend</legend>
         <p className="feld-hilfe">
-          Damit wir richtig einkaufen. Alles freiwillig: Ohne Angabe planen wir dich mit Wurst und Bier ein.
+          Damit wir richtig einkaufen. Alles freiwillig: Ohne Angabe planen wir mit Wurst und Bier
+          {guestChildren > 0 ? ", bei Kindern mit Wurst und alkoholfreien Getränken." : "."}
         </p>
-        <div className="feld">
-          <span className="label" id="essen-label">
-            Essen
-          </span>
-          <div className="kacheln" role="radiogroup" aria-labelledby="essen-label">
-            {FOOD_OPTIONS.map((option) => (
-              <label key={option.value} className="haken">
-                <input
-                  type="radio"
-                  name="foodChoice"
-                  value={option.value}
-                  defaultChecked={chosenFood === option.value}
-                />
-                <span>{option.label}</span>
-              </label>
-            ))}
+        <div className="person">
+          {guestAdults + guestChildren > 0 && <p className="person-titel">Für dich</p>}
+          <div className="feld">
+            <span className="label" id="essen-label">
+              Essen
+            </span>
+            <FoodTiles name="foodChoice" labelId="essen-label" chosen={chosenFood} />
+          </div>
+          <div className="feld">
+            <span className="label" id="getraenke-label">
+              Getränke (Mehrfachauswahl)
+            </span>
+            <DrinkTiles name="drinkChoices" labelId="getraenke-label" valueFor={(drink) => drink} chosen={chosenDrinks} />
           </div>
         </div>
-        <div className="feld">
-          <span className="label" id="getraenke-label">
-            Getränke (Mehrfachauswahl)
-          </span>
-          <div className="kacheln" role="group" aria-labelledby="getraenke-label">
-            {DRINK_OPTIONS.map((option) => (
-              <label key={option.value} className="haken">
-                <input
-                  type="checkbox"
-                  name="drinkChoices"
-                  value={option.value}
-                  defaultChecked={chosenDrinks.includes(option.value)}
-                />
-                <span>{option.label}</span>
-              </label>
-            ))}
+        {Array.from({ length: guestAdults }, (_, index) => (
+          <div key={`erwachsen-${index}`} className="person">
+            <p className="person-titel">Erwachsene Begleitung {index + 1}</p>
+            <div className="feld">
+              <span className="label" id={`gast-${index}-essen`}>
+                Essen
+              </span>
+              <FoodTiles
+                name={adultFoodField(index)}
+                labelId={`gast-${index}-essen`}
+                chosen={textValue(values, adultFoodField(index))}
+              />
+            </div>
+            <div className="feld">
+              <span className="label" id={`gast-${index}-getraenke`}>
+                Getränke (Mehrfachauswahl)
+              </span>
+              <DrinkTiles
+                name="guestDrinks"
+                labelId={`gast-${index}-getraenke`}
+                valueFor={(drink) => guestDrinkValue(index, drink)}
+                chosen={chosenGuestDrinks}
+              />
+            </div>
           </div>
-          <p className="feld-hilfe">Spritzgetränke (Aperol und Sarti Spritz) gibt es, wenn genug Leute Interesse haben.</p>
-        </div>
+        ))}
+        {Array.from({ length: guestChildren }, (_, index) => (
+          <div key={`kind-${index}`} className="person">
+            <p className="person-titel">Kind {index + 1}</p>
+            <div className="feld">
+              <span className="label" id={`kind-${index}-essen`}>
+                Essen
+              </span>
+              <FoodTiles
+                name={childFoodField(index)}
+                labelId={`kind-${index}-essen`}
+                chosen={textValue(values, childFoodField(index))}
+              />
+              <p className="feld-hilfe">Für Kinder gibt es alkoholfreie Getränke.</p>
+            </div>
+          </div>
+        ))}
+        <p className="feld-hilfe">Spritzgetränke (Aperol und Sarti Spritz) gibt es, wenn genug Leute Interesse haben.</p>
       </fieldset>
 
       <fieldset className="teil teil-optional" data-aktiv={plays}>

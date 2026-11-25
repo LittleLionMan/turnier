@@ -22,7 +22,7 @@ export default function PrivacyPage() {
         kommen deine Positionen und gegebenenfalls dein Geschlecht dazu, außerdem deine Bestätigung des
         Versicherungshinweises. Wenn du mithilfst, speichern wir die gewählten Helferrollen. Für die Zahlung speichern
         wir, ob und wann dein Beitrag eingegangen ist. Für den Einkauf zum Abendprogramm speichern wir freiwillig deine
-        Essens- und Getränkewünsche.
+        Essens- und Getränkewünsche sowie die Anzahl deiner Begleitpersonen (ohne Namen).
       </p>
 
       <h2>Wofür</h2>

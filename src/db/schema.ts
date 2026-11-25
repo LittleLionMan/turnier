@@ -1,8 +1,10 @@
 import { relations } from "drizzle-orm";
+import type { DrinkChoice } from "@/lib/constants";
 import {
   boolean,
   date,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -76,6 +78,22 @@ export const event = pgTable("event", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export type AdultGuestPreference = {
+  food: FoodChoice | null;
+  drinks: DrinkChoice[];
+};
+
+export type ChildGuestPreference = {
+  food: FoodChoice | null;
+};
+
+export type GuestPreferences = {
+  adults: AdultGuestPreference[];
+  children: ChildGuestPreference[];
+};
+
+export const EMPTY_GUEST_PREFERENCES: GuestPreferences = { adults: [], children: [] };
+
 export const genderEnum = pgEnum("gender", ["weiblich", "maennlich", "divers"]);
 export const paymentStatusEnum = pgEnum("payment_status", ["offen", "bezahlt"]);
 export const foodChoiceEnum = pgEnum("food_choice", ["fleisch", "vegetarisch", "vegan"]);
@@ -101,6 +119,9 @@ export const registration = pgTable(
     insuranceAccepted: boolean("insurance_accepted").notNull().default(false),
     foodChoice: foodChoiceEnum("food_choice"),
     drinkChoices: text("drink_choices").array().notNull().default([]),
+    guestAdults: integer("guest_adults").notNull().default(0),
+    guestChildren: integer("guest_children").notNull().default(0),
+    guestPreferences: jsonb("guest_preferences").$type<GuestPreferences>().notNull().default(EMPTY_GUEST_PREFERENCES),
     paymentStatus: paymentStatusEnum("payment_status").notNull().default("offen"),
     paidAt: timestamp("paid_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

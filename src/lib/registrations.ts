@@ -8,6 +8,7 @@ import {
   type EventRow,
   type FoodChoice,
   type Gender,
+  type GuestPreferences,
   type PaymentStatus,
 } from "@/db/schema";
 import type { ParticipationInput } from "./validation";
@@ -29,6 +30,9 @@ export type RegistrationDetails = {
   insuranceAccepted: boolean;
   foodChoice: FoodChoice | null;
   drinkChoices: string[];
+  guestAdults: number;
+  guestChildren: number;
+  guestPreferences: GuestPreferences;
   paymentStatus: PaymentStatus;
   paymentState: PaymentState;
   paidAt: Date | null;
@@ -36,6 +40,7 @@ export type RegistrationDetails = {
   helperRoleIds: number[];
   helperRoleLabels: string[];
   exemptingRoleLabels: string[];
+  selfExempt: boolean;
 };
 
 export class HelperRoleFullError extends Error {
@@ -48,6 +53,7 @@ export async function saveParticipation(
   eventRow: EventRow,
   userId: string,
   input: ParticipationInput,
+  guestPreferences: GuestPreferences,
 ): Promise<number> {
   const values = {
     firstName: input.firstName,
@@ -61,6 +67,9 @@ export async function saveParticipation(
     insuranceAccepted: input.playsTournament && input.insuranceAccepted,
     foodChoice: input.foodChoice,
     drinkChoices: [...new Set(input.drinkChoices)],
+    guestAdults: input.guestAdults,
+    guestChildren: input.guestChildren,
+    guestPreferences,
     updatedAt: new Date(),
   };
 
@@ -163,8 +172,9 @@ export async function listRegistrations(eventId: number, userId?: string): Promi
   return rows.map(({ registration: row, email }) => {
     const roles = roleRows.filter((role) => role.registrationId === row.id);
     const exemptingRoleLabels = roles.filter((role) => role.exemptsFromFee).map((role) => role.label);
+    const selfExempt = exemptingRoleLabels.length > 0;
     const paymentState: PaymentState =
-      row.paymentStatus === "bezahlt" ? "bezahlt" : exemptingRoleLabels.length > 0 ? "befreit" : "offen";
+      row.paymentStatus === "bezahlt" ? "bezahlt" : selfExempt && row.guestAdults === 0 ? "befreit" : "offen";
     return {
       id: row.id,
       userId: row.userId,
@@ -180,6 +190,9 @@ export async function listRegistrations(eventId: number, userId?: string): Promi
       insuranceAccepted: row.insuranceAccepted,
       foodChoice: row.foodChoice,
       drinkChoices: row.drinkChoices,
+      guestAdults: row.guestAdults,
+      guestChildren: row.guestChildren,
+      guestPreferences: row.guestPreferences,
       paymentStatus: row.paymentStatus,
       paymentState,
       paidAt: row.paidAt,
@@ -187,6 +200,7 @@ export async function listRegistrations(eventId: number, userId?: string): Promi
       helperRoleIds: roles.map((role) => role.id),
       helperRoleLabels: roles.map((role) => role.label),
       exemptingRoleLabels,
+      selfExempt,
     };
   });
 }
@@ -233,4 +247,20 @@ export function peakPeriods(distribution: YearCount[]): PeakPeriods | null {
     }
   }
   return { count: peak, ranges };
+}
+
+export type AmountDue = {
+  ownCents: number;
+  guestsCents: number;
+  totalCents: number;
+};
+
+export function amountDue(feeCents: number, entry: RegistrationDetails): AmountDue {
+  const ownCents = entry.selfExempt ? 0 : feeCents;
+  const guestsCents = entry.guestAdults * feeCents;
+  return { ownCents, guestsCents, totalCents: ownCents + guestsCents };
+}
+
+export function headcount(entry: RegistrationDetails): number {
+  return 1 + entry.guestAdults + entry.guestChildren;
 }

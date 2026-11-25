@@ -10,9 +10,9 @@ import {
   paymentCode,
 } from "@/lib/event";
 import { exemptionSentence, helperRoleOptions } from "@/lib/helper-roles";
-import { findRegistrationForUser, type RegistrationDetails } from "@/lib/registrations";
+import { amountDue, findRegistrationForUser, type RegistrationDetails } from "@/lib/registrations";
 import { requireUser } from "@/lib/session";
-import type { RawFormValues } from "@/lib/validation";
+import { guestPreferencesToForm, type RawFormValues } from "@/lib/validation";
 import { logoutAction } from "./actions";
 import styles from "./page.module.css";
 import { DeleteAccountForm, EmailForm, ParticipationForm, PasswordForm } from "./ProfileForms";
@@ -39,12 +39,19 @@ function toFormValues(entry: RegistrationDetails): RawFormValues {
     helperRoleIds: entry.helperRoleIds.map(String),
     foodChoice: entry.foodChoice ?? "",
     drinkChoices: entry.drinkChoices,
+    guestAdults: String(entry.guestAdults),
+    guestChildren: String(entry.guestChildren),
+    ...guestPreferencesToForm(entry.guestPreferences),
   };
 }
 
 function paypalLink(baseUrl: string, cents: number): string {
   const amount = (cents / 100).toFixed(2);
   return `${baseUrl.replace(/\/+$/, "")}/${amount}EUR`;
+}
+
+function guestText(adults: number): string {
+  return adults === 1 ? "deine erwachsene Begleitung" : `deine ${adults} erwachsenen Begleitpersonen`;
 }
 
 function PaymentStatus({ eventRow, entry }: { eventRow: EventRow; entry: RegistrationDetails }) {
@@ -73,16 +80,25 @@ function PaymentStatus({ eventRow, entry }: { eventRow: EventRow; entry: Registr
     );
   }
 
+  const amount = amountDue(eventRow.feeCents, entry);
+
   return (
     <>
       <p>
         <span className="marke marke-offen">Beitrag offen</span> Du bist angemeldet. Verbindlich dabei bist du, sobald
-        dein Beitrag von {formatFee(eventRow.feeCents)} eingegangen ist.
+        dein Beitrag von {formatFee(amount.totalCents)} eingegangen ist.
       </p>
+      {entry.guestAdults > 0 && (
+        <p className="leise">
+          {entry.selfExempt
+            ? `Du selbst bist befreit. Der Betrag gilt für ${guestText(entry.guestAdults)}${entry.guestAdults > 1 ? ` (je ${formatFee(eventRow.feeCents)})` : ""}.`
+            : `${formatFee(amount.ownCents)} für dich und ${formatFee(amount.guestsCents)} für ${guestText(entry.guestAdults)}.`}
+        </p>
+      )}
       <dl className={styles.zahlung}>
         <div>
           <dt>Betrag</dt>
-          <dd>{formatFee(eventRow.feeCents)}</dd>
+          <dd>{formatFee(amount.totalCents)}</dd>
         </div>
         <div>
           <dt>Verwendungszweck</dt>
@@ -94,7 +110,7 @@ function PaymentStatus({ eventRow, entry }: { eventRow: EventRow; entry: Registr
       <p>
         <a
           className="knopf"
-          href={paypalLink(eventRow.paypalMeUrl, eventRow.feeCents)}
+          href={paypalLink(eventRow.paypalMeUrl, amount.totalCents)}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -154,6 +170,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             genderEnabled={eventRow.genderEnabled}
             tournamentLocked={!open}
             isNew={!entry}
+            guestFee={isPaymentActive(eventRow) ? formatFee(eventRow.feeCents) : null}
           />
         )}
       </section>
