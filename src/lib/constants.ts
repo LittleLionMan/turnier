@@ -27,7 +27,7 @@ export const FOOD_OPTIONS = [
 
 export const DRINK_OPTIONS = [
   { value: "bier", label: "Bier" },
-  { value: "spritz", label: "Spirtzgetränke" },
+  { value: "spritz", label: "Spritzgetränke" },
   { value: "wein", label: "Wein" },
   { value: "alkoholfrei", label: "Alkoholfrei" },
 ] as const;

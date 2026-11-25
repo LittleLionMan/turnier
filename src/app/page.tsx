@@ -100,7 +100,7 @@ export default async function Home() {
       {photos.length > 0 && (
         <section className={styles.erfolge} aria-labelledby="erfolge-titel">
           <div className="wrap">
-            <h2 id="erfolge-titel">Was wir schon geholt haben</h2>
+            <h2 id="erfolge-titel">Als wir noch jünger waren</h2>
             <Gallery photos={photos} />
           </div>
         </section>
