@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EARLIEST_ACTIVE_YEAR, GENDER_OPTIONS, POSITIONS } from "./constants";
+import { DRINK_OPTIONS, EARLIEST_ACTIVE_YEAR, FOOD_OPTIONS, GENDER_OPTIONS, POSITIONS } from "./constants";
 
 const checkbox = z
   .string()
@@ -37,6 +37,16 @@ const genderValues = GENDER_OPTIONS.map((option) => option.value) as [
   ...(typeof GENDER_OPTIONS)[number]["value"][],
 ];
 
+const foodValues = FOOD_OPTIONS.map((option) => option.value) as [
+  (typeof FOOD_OPTIONS)[number]["value"],
+  ...(typeof FOOD_OPTIONS)[number]["value"][],
+];
+
+const drinkValues = DRINK_OPTIONS.map((option) => option.value) as [
+  (typeof DRINK_OPTIONS)[number]["value"],
+  ...(typeof DRINK_OPTIONS)[number]["value"][],
+];
+
 export const participationSchema = z
   .object({
     firstName: z.string().trim().min(1, "Bitte gib deinen Vornamen an.").max(50, "Bitte höchstens 50 Zeichen."),
@@ -53,6 +63,11 @@ export const participationSchema = z
       .transform((value) => value ?? null),
     insuranceAccepted: checkbox,
     helperRoleIds: z.array(z.coerce.number().int().positive()).default([]),
+    foodChoice: z
+      .enum(foodValues)
+      .optional()
+      .transform((value) => value ?? null),
+    drinkChoices: z.array(z.enum(drinkValues)).default([]),
   })
   .superRefine((data, ctx) => {
     if (data.activeTo !== null && data.activeFrom === null) {
@@ -113,7 +128,7 @@ export type FormState = {
   values?: RawFormValues;
 };
 
-const MULTI_VALUE_FIELDS = new Set(["positions", "helperRoleIds"]);
+const MULTI_VALUE_FIELDS = new Set(["positions", "helperRoleIds", "drinkChoices"]);
 const SECRET_FIELDS = new Set(["password", "passwordConfirm", "currentPassword", "newPassword", "newPasswordConfirm"]);
 
 export function readForm(formData: FormData): RawFormValues {

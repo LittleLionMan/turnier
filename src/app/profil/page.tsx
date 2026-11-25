@@ -37,6 +37,8 @@ function toFormValues(entry: RegistrationDetails): RawFormValues {
     gender: entry.gender ?? "",
     insuranceAccepted: flag(entry.insuranceAccepted),
     helperRoleIds: entry.helperRoleIds.map(String),
+    foodChoice: entry.foodChoice ?? "",
+    drinkChoices: entry.drinkChoices,
   };
 }
 

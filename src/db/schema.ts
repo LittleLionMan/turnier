@@ -78,6 +78,7 @@ export const event = pgTable("event", {
 
 export const genderEnum = pgEnum("gender", ["weiblich", "maennlich", "divers"]);
 export const paymentStatusEnum = pgEnum("payment_status", ["offen", "bezahlt"]);
+export const foodChoiceEnum = pgEnum("food_choice", ["fleisch", "vegetarisch", "vegan"]);
 
 export const registration = pgTable(
   "registration",
@@ -98,6 +99,8 @@ export const registration = pgTable(
     positions: text("positions").array().notNull().default([]),
     gender: genderEnum("gender"),
     insuranceAccepted: boolean("insurance_accepted").notNull().default(false),
+    foodChoice: foodChoiceEnum("food_choice"),
+    drinkChoices: text("drink_choices").array().notNull().default([]),
     paymentStatus: paymentStatusEnum("payment_status").notNull().default("offen"),
     paidAt: timestamp("paid_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -151,6 +154,7 @@ export const registrationHelperRoleRelations = relations(registrationHelperRole,
 
 export type Gender = (typeof genderEnum.enumValues)[number];
 export type PaymentStatus = (typeof paymentStatusEnum.enumValues)[number];
+export type FoodChoice = (typeof foodChoiceEnum.enumValues)[number];
 export type EventRow = typeof event.$inferSelect;
 export type RegistrationRow = typeof registration.$inferSelect;
 export type HelperRoleRow = typeof helperRole.$inferSelect;

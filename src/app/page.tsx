@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { count, eq } from "drizzle-orm";
 import { Gallery } from "@/components/Gallery";
+import { NavIcon } from "@/components/NavIcon";
 import { SharePanel } from "@/components/SharePanel";
 import { welcomeHeading, welcomeParagraphs, welcomeSignature } from "@/content/welcome";
 import { db } from "@/db";
@@ -32,50 +33,60 @@ export default async function Home() {
 
   return (
     <>
-      <section className={styles.gelb}>
-        <div className={`wrap ${styles.gelbInnen}`}>
+      <section className={styles.hero} aria-labelledby="hero-titel">
+        <div className={styles.kopfband}>
           <div>
-            <p className={styles.einladung}>Die Handballabteilung des SC Münster 08 lädt alle Ehemaligen ein.</p>
-            <dl className={styles.fakten}>
-              <div>
-                <dt>Wann</dt>
-                <dd>
-                  {eventRow.eventDate ? formatDate(eventRow.eventDate) : "Termin folgt"}
-                  {eventRow.startTime ? `, ab ${eventRow.startTime} Uhr` : ""}
-                </dd>
-              </div>
-              <div>
-                <dt>Wo</dt>
-                <dd>{eventRow.location ?? "Ort folgt"}</dd>
-              </div>
-              <div>
-                <dt>Anmeldung</dt>
-                <dd>{deadline ? `bis ${formatDate(deadline)}` : "ab sofort offen"}</dd>
-              </div>
-            </dl>
-            <div className={styles.aktionen}>
-              {user ? (
-                <Link href="/profil" className="knopf">
-                  Zu deinem Profil
-                </Link>
-              ) : open ? (
-                <Link href="/anmelden" className="knopf">
-                  Jetzt anmelden
-                </Link>
-              ) : (
-                <p className={styles.geschlossen}>Die Anmeldung ist geschlossen.</p>
-              )}
-              <Link href="/teilnehmer" className={styles.zaehler}>
-                {registered === 1 ? "1 Person ist schon dabei" : `${registered} Leute sind schon dabei`}
-              </Link>
-            </div>
+            <p className={styles.einladung}>Die Handballabteilung des SC Münster 08 lädt alle Ehemaligen ein</p>
+            <h1 id="hero-titel" className={styles.titel}>
+              {eventRow.name}
+            </h1>
           </div>
           <Image src="/logo.png" alt="Wappen des SC Münster 08" width={220} height={297} className={styles.wappen} priority />
         </div>
-      </section>
-
-      <section className={styles.rot} aria-label="Veranstaltung">
-        <h1 className={`wrap ${styles.titel}`}>{eventRow.name}</h1>
+        <div className={styles.infoband}>
+          <dl className={styles.fakten}>
+            <div className={styles.fakt}>
+              <dt>
+                <NavIcon name="datum" />
+                Wann
+              </dt>
+              <dd>
+                {eventRow.eventDate ? formatDate(eventRow.eventDate) : "Termin folgt"}
+                {eventRow.startTime && <span className={styles.zusatz}>ab {eventRow.startTime} Uhr</span>}
+              </dd>
+            </div>
+            <div className={styles.fakt}>
+              <dt>
+                <NavIcon name="ort" />
+                Wo
+              </dt>
+              <dd>{eventRow.location ?? "Ort folgt"}</dd>
+            </div>
+            <div className={styles.fakt}>
+              <dt>
+                <NavIcon name="frist" />
+                Anmeldung
+              </dt>
+              <dd>{deadline ? `bis ${formatDate(deadline)}` : "ab sofort offen"}</dd>
+            </div>
+          </dl>
+          <div className={styles.aktionen}>
+            {user ? (
+              <Link href="/profil" className="knopf">
+                Zu deinem Profil
+              </Link>
+            ) : open ? (
+              <Link href="/anmelden" className="knopf">
+                Jetzt anmelden
+              </Link>
+            ) : (
+              <p className={styles.geschlossen}>Die Anmeldung ist geschlossen.</p>
+            )}
+            <Link href="/teilnehmer" className="knopf knopf-zweit">
+              {registered === 1 ? "1 Person ist schon dabei" : `${registered} Leute sind schon dabei`}
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section className={`wrap-schmal ${styles.gruss}`}>
@@ -89,7 +100,7 @@ export default async function Home() {
       {photos.length > 0 && (
         <section className={styles.erfolge} aria-labelledby="erfolge-titel">
           <div className="wrap">
-            <h2 id="erfolge-titel">Als wir noch jünger waren</h2>
+            <h2 id="erfolge-titel">Was wir schon geholt haben</h2>
             <Gallery photos={photos} />
           </div>
         </section>

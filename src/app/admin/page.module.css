@@ -48,6 +48,20 @@
   font-variant-numeric: tabular-nums;
 }
 
+.hinweise {
+  margin-top: 1.5rem;
+  max-width: 48rem;
+}
+
+.hinweise ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.hinweise li {
+  padding: 0.2rem 0;
+}
+
 .kopfzeile {
   display: flex;
   justify-content: space-between;

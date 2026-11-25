@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GENDER_OPTIONS, POSITIONS } from "@/lib/constants";
+import { DRINK_OPTIONS, FOOD_OPTIONS, GENDER_OPTIONS, POSITIONS } from "@/lib/constants";
 import type { HelperRoleOption } from "@/lib/helper-roles";
 import type { FieldErrors, RawFormValues } from "@/lib/validation";
 import { checked, FieldError, invalidProps, listValue, textValue } from "./form-bits";
@@ -24,6 +24,8 @@ export function ParticipationFields({
   const [plays, setPlays] = useState(checked(values, "playsTournament"));
   const chosenPositions = listValue(values, "positions");
   const chosenRoles = listValue(values, "helperRoleIds");
+  const chosenFood = textValue(values, "foodChoice");
+  const chosenDrinks = listValue(values, "drinkChoices");
   const currentYear = new Date().getFullYear();
 
   return (
@@ -107,6 +109,50 @@ export function ParticipationFields({
         </label>
       </fieldset>
 
+      <fieldset className="teil teil-optional" data-aktiv={chosenFood !== "" || chosenDrinks.length > 0}>
+        <legend>Für den Abend</legend>
+        <p className="feld-hilfe">
+          Damit wir richtig einkaufen. Alles freiwillig: Ohne Angabe planen wir dich mit Wurst und Bier ein.
+        </p>
+        <div className="feld">
+          <span className="label" id="essen-label">
+            Essen
+          </span>
+          <div className="kacheln" role="radiogroup" aria-labelledby="essen-label">
+            {FOOD_OPTIONS.map((option) => (
+              <label key={option.value} className="haken">
+                <input
+                  type="radio"
+                  name="foodChoice"
+                  value={option.value}
+                  defaultChecked={chosenFood === option.value}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <div className="feld">
+          <span className="label" id="getraenke-label">
+            Getränke (Mehrfachauswahl)
+          </span>
+          <div className="kacheln" role="group" aria-labelledby="getraenke-label">
+            {DRINK_OPTIONS.map((option) => (
+              <label key={option.value} className="haken">
+                <input
+                  type="checkbox"
+                  name="drinkChoices"
+                  value={option.value}
+                  defaultChecked={chosenDrinks.includes(option.value)}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+          <p className="feld-hilfe">Spritzgetränke (Aperol und Sarti Spritz) gibt es, wenn genug Leute Interesse haben.</p>
+        </div>
+      </fieldset>
+
       <fieldset className="teil teil-optional" data-aktiv={plays}>
         <legend>Du spielst im Turnier mit</legend>
         <label className="haken haken-gross">
@@ -128,7 +174,7 @@ export function ParticipationFields({
               <span className="label" id="positionen-label">
                 Auf welchen Positionen spielst du?
               </span>
-              <div className="positionen" role="group" aria-labelledby="positionen-label">
+              <div className="kacheln" role="group" aria-labelledby="positionen-label">
                 {POSITIONS.map((position) => (
                   <label key={position} className="haken">
                     <input
@@ -143,28 +189,22 @@ export function ParticipationFields({
               </div>
               <FieldError errors={errors} name="positions" />
             </div>
-            <div className="feld">
-              <label htmlFor="gender">Geschlecht</label>
-              <select
-                id="gender"
-                name="gender"
-                disabled={!genderEnabled}
-                defaultValue={textValue(values, "gender")}
-                aria-describedby="gender-hilfe"
-              >
-                <option value="">Bitte wählen</option>
-                {GENDER_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <p className="feld-hilfe" id="gender-hilfe">
-                {genderEnabled
-                  ? "Wir brauchen die Angabe für die Einteilung in Damen- und Herrenturnier."
-                  : "Ob es zusätzlich ein Damenturnier gibt, klären wir noch. Bis dahin bleibt das Feld gesperrt."}
-              </p>
-            </div>
+            {genderEnabled && (
+              <div className="feld">
+                <label htmlFor="gender">Geschlecht</label>
+                <select id="gender" name="gender" defaultValue={textValue(values, "gender")} aria-describedby="gender-hilfe">
+                  <option value="">Bitte wählen</option>
+                  {GENDER_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="feld-hilfe" id="gender-hilfe">
+                  Wir brauchen die Angabe für die Einteilung in Damen- und Herrenturnier.
+                </p>
+              </div>
+            )}
             <div className="hinweis">
               <p>
                 <strong>Versicherung:</strong> [Platzhalter] Wer kein Vereinsmitglied ist, ist beim Turnier nicht über

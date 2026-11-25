@@ -25,6 +25,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -37,6 +38,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding-bottom: calc(66px + env(safe-area-inset-bottom));
 }
 
 main {
@@ -113,21 +115,27 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  min-height: 48px;
   border: 2px solid var(--kontur);
   background: var(--rot-tief);
-  border-color: var(--rot-tief);
   color: var(--weiss);
-  font: 600 1rem/1 var(--text);
-  padding: 0.9rem 1.4rem;
-  border-radius: 0.4rem;
+  font: 600 1rem/1.2 var(--text);
+  text-align: center;
+  padding: 0.75rem 1.4rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 3px 0 var(--kontur);
   text-decoration: none;
   cursor: pointer;
 }
 
 .knopf:hover {
   background: var(--kontur);
-  border-color: var(--kontur);
   color: var(--weiss);
+}
+
+.knopf:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--kontur);
 }
 
 .knopf[disabled] {
@@ -136,9 +144,8 @@ a:hover {
 }
 
 .knopf-zweit {
-  background: transparent;
+  background: var(--weiss);
   color: var(--kontur);
-  border-color: var(--kontur);
 }
 
 .knopf-zweit:hover {
@@ -148,20 +155,21 @@ a:hover {
 
 .knopf-klein {
   min-height: 40px;
-  padding: 0.5rem 0.8rem;
+  padding: 0.45rem 0.8rem;
   font-size: 0.9rem;
+  box-shadow: 0 2px 0 var(--kontur);
 }
 
 .knopf-gefahr {
-  background: transparent;
+  background: var(--weiss);
   color: var(--rot-tief);
   border-color: var(--rot-tief);
+  box-shadow: 0 3px 0 var(--rot-tief);
 }
 
 .knopf-gefahr:hover {
   background: var(--rot-tief);
   color: var(--weiss);
-  border-color: var(--rot-tief);
 }
 
 .hinweis {
@@ -260,12 +268,6 @@ a:hover {
   box-shadow: 0 0 0 3px var(--gelb);
 }
 
-.feld select:disabled {
-  background: var(--flaeche);
-  color: var(--tinte-2);
-  cursor: not-allowed;
-}
-
 .feld [aria-invalid="true"] {
   border-color: var(--rot);
 }
@@ -311,13 +313,13 @@ a:hover {
   font-size: 1.05rem;
 }
 
-.positionen {
+.kacheln {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
   gap: 0.5rem;
 }
 
-.positionen .haken {
+.kacheln .haken {
   border: 2px solid var(--linie);
   border-radius: 0.4rem;
   padding: 0.7rem 0.75rem;
@@ -325,11 +327,17 @@ a:hover {
   align-items: center;
 }
 
-.positionen .haken input {
+.kacheln .haken input {
   margin-top: 0;
 }
 
-.positionen .haken:has(input:checked) {
+.kacheln .haken span {
+  min-width: 0;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+.kacheln .haken:has(input:checked) {
   border-color: var(--kontur);
   background: var(--gelb);
 }
@@ -391,6 +399,12 @@ a:hover {
   width: 100%;
 }
 
+@media (min-width: 48rem) {
+  body {
+    padding-bottom: 0;
+  }
+}
+
 @media (min-width: 40rem) {
   .seite {
     padding-block: 3rem 5rem;
@@ -437,4 +451,8 @@ a:hover {
 .haken:has(input:disabled) {
   cursor: not-allowed;
   color: var(--tinte-2);
+}
+
+html:has(dialog[open]) {
+  overflow: hidden;
 }

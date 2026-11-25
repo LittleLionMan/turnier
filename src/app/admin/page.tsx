@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { POSITIONS } from "@/lib/constants";
+import { eveningSummary, type ShoppingLine } from "@/lib/evening";
 import { formatFee, fullName, getCurrentEvent, getHelperRoles, paymentCode } from "@/lib/event";
 import { listPhotos } from "@/lib/photos";
 import { listRegistrations, type PaymentState } from "@/lib/registrations";
@@ -20,6 +21,25 @@ const FILTER_LABELS: Record<Filter, string> = {
   bezahlt: "Bezahlt",
   befreit: "Beitragsfrei",
 };
+
+function ShoppingList({ title, lines }: { title: string; lines: ShoppingLine[] }) {
+  return (
+    <div>
+      <h3>{title}</h3>
+      <ul>
+        {lines.map((line) => (
+          <li key={line.value}>
+            <span>
+              {line.label}
+              {line.viaDefault > 0 && <span className="leise"> (davon {line.viaDefault} ohne Angabe)</span>}
+            </span>
+            <span>{line.count}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 type AdminPageProps = {
   searchParams: Promise<{ status?: string }>;
@@ -43,6 +63,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const open = entries.filter((entry) => entry.paymentState === "offen");
   const visible = filter === "alle" ? entries : entries.filter((entry) => entry.paymentState === filter);
   const players = entries.filter((entry) => entry.playsTournament);
+  const evening = eveningSummary(entries);
 
   return (
     <div className="wrap seite">
@@ -95,6 +116,18 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               ))}
             </ul>
           </div>
+        </div>
+      </section>
+
+      <section className={styles.abschnitt} aria-labelledby="abend-titel">
+        <h2 id="abend-titel">Einkaufsliste für den Abend</h2>
+        <p className="leise">
+          Personen pro Wunsch. Wer nichts angegeben hat, zählt als Fleisch und Bier. Bei Getränken sind Mehrfachnennungen
+          möglich.
+        </p>
+        <div className={styles.verteilung}>
+          <ShoppingList title="Essen" lines={evening.food} />
+          <ShoppingList title="Getränke" lines={evening.drinks} />
         </div>
       </section>
 

@@ -1,3 +1,4 @@
+import { drinkLabel, effectiveDrinks, effectiveFood, foodLabel } from "@/lib/evening";
 import { getCurrentEvent, paymentCode } from "@/lib/event";
 import { listRegistrations } from "@/lib/registrations";
 import { getSessionUser, isAdminEmail } from "@/lib/session";
@@ -29,6 +30,8 @@ export async function GET(): Promise<Response> {
     "Geschlecht",
     "Versicherungshinweis bestätigt",
     "Helferrollen",
+    "Essen",
+    "Getränke",
     "Bezahlstatus",
     "Bezahlt am",
     "Angemeldet am",
@@ -46,6 +49,8 @@ export async function GET(): Promise<Response> {
     entry.gender,
     entry.insuranceAccepted,
     entry.helperRoleLabels.join(", "),
+    `${foodLabel(effectiveFood(entry))}${entry.foodChoice === null ? " (Standard)" : ""}`,
+    `${effectiveDrinks(entry).map(drinkLabel).join(", ")}${entry.drinkChoices.length === 0 ? " (Standard)" : ""}`,
     entry.paymentState,
     entry.paidAt?.toISOString() ?? null,
     entry.createdAt.toISOString(),

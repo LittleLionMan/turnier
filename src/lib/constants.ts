@@ -19,6 +19,24 @@ export const GENDER_OPTIONS = [
   { value: "divers", label: "divers" },
 ] as const;
 
+export const FOOD_OPTIONS = [
+  { value: "fleisch", label: "Fleisch" },
+  { value: "vegetarisch", label: "Vegetarisch" },
+  { value: "vegan", label: "Vegan" },
+] as const;
+
+export const DRINK_OPTIONS = [
+  { value: "bier", label: "Bier" },
+  { value: "spritz", label: "Spirtzgetränke" },
+  { value: "wein", label: "Wein" },
+  { value: "alkoholfrei", label: "Alkoholfrei" },
+] as const;
+
+export type DrinkChoice = (typeof DRINK_OPTIONS)[number]["value"];
+
+export const DEFAULT_FOOD = "fleisch";
+export const DEFAULT_DRINKS: DrinkChoice[] = ["bier"];
+
 export const REGISTRATION_DEADLINE_DAYS = 14;
 export const EARLIEST_ACTIVE_YEAR = 1950;
 export const TIME_ZONE = "Europe/Berlin";

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getSessionUser, isAdminEmail } from "@/lib/session";
 import styles from "./SiteHeader.module.css";
+import { SiteNav } from "./SiteNav";
 
 export async function SiteHeader() {
   const user = await getSessionUser();
@@ -9,28 +10,15 @@ export async function SiteHeader() {
 
   return (
     <header className={styles.kopf}>
-      <div className={styles.streifen} aria-hidden="true" />
       <div className={`wrap ${styles.leiste}`}>
         <Link href="/" className={styles.marke}>
           <Image src="/logo.png" alt="" width={34} height={46} priority />
-          <span>Ehemaligenturnier</span>
+          <span>
+            Ehemaligenturnier
+            <small>SC Münster 08 Handball</small>
+          </span>
         </Link>
-        <nav aria-label="Hauptnavigation" className={styles.nav}>
-          <Link href="/teilnehmer">Wer ist dabei?</Link>
-          {admin && <Link href="/admin">Admin</Link>}
-          {user ? (
-            <Link href="/profil" className={styles.aktion}>
-              Mein Profil
-            </Link>
-          ) : (
-            <>
-              <Link href="/login">Einloggen</Link>
-              <Link href="/anmelden" className={styles.aktion}>
-                Anmelden
-              </Link>
-            </>
-          )}
-        </nav>
+        <SiteNav loggedIn={user !== null} admin={admin} />
       </div>
     </header>
   );

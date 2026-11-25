@@ -53,7 +53,7 @@ export function isPaymentActive(eventRow: EventRow): boolean {
 }
 
 export const FEE_PENDING_NOTE =
-  "Für die Teilnahme fällt ein Beitrag an. Wie viel und wie ihr bezahlt, sagen wir euch rechtzeitig.";
+  "Für Speis und Trank werden wir euch wohl ein paar Kröten abzwacken müssen. Wie viel und wie ihr bezahlt, sagen wir euch rechtzeitig.";
 
 export function paymentCode(registrationId: number): string {
   return `EHE-${String(registrationId).padStart(4, "0")}`;

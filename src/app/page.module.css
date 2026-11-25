@@ -1,80 +1,102 @@
-.gelb {
+.hero {
+  margin: 0.75rem;
+  border: 3px solid var(--kontur);
+  border-radius: 1rem;
+  overflow: hidden;
   background: var(--gelb);
 }
 
-.gelbInnen {
+.kopfband {
   display: grid;
-  gap: 2rem;
-  padding-block: 2rem;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 1.5rem;
+  background: var(--rot);
+  color: var(--weiss);
+  padding: 1.25rem 1.25rem 1rem;
 }
 
 .einladung {
-  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  max-width: 30rem;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
-.fakten {
-  display: grid;
-  gap: 0.75rem;
-  margin: 1.5rem 0;
-}
-
-.fakten dt {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--kontur);
-  opacity: 0.75;
-}
-
-.fakten dd {
+.titel {
   margin: 0;
-  font-weight: 600;
-}
-
-.aktionen {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.75rem;
-}
-
-.aktionen :global(.knopf) {
-  width: 100%;
-}
-
-.zaehler {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  color: var(--kontur);
-  font-weight: 600;
-}
-
-.geschlossen {
-  margin: 0;
-  font-weight: 600;
+  font-size: clamp(2.5rem, 11vw, 8rem);
+  line-height: 0.85;
+  letter-spacing: 0;
+  hyphens: auto;
 }
 
 .wappen {
   display: none;
 }
 
-.rot {
-  background: var(--rot);
-  color: var(--weiss);
-  overflow: hidden;
+.infoband {
+  padding: 1rem;
 }
 
-.titel {
-  font-size: clamp(2.75rem, 11.5vw, 10.5rem);
-  line-height: 0.85;
-  margin-block: 0;
-  padding-block: 1.75rem 1.25rem;
-  letter-spacing: 0;
-  hyphens: auto;
+.fakten {
+  margin: 0;
+  display: grid;
+  background: var(--weiss);
+  border: 2px solid var(--kontur);
+  border-radius: 0.75rem;
+}
+
+.fakt {
+  padding: 0.85rem 1rem;
+}
+
+.fakt + .fakt {
+  border-top: 1px solid var(--linie);
+}
+
+.fakt dt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--tinte-2);
+}
+
+.fakt dt svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--rot-tief);
+}
+
+.fakt dd {
+  margin: 0.2rem 0 0 1.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.zusatz {
+  display: block;
+  font-weight: 400;
+  color: var(--tinte-2);
+}
+
+.aktionen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.aktionen :global(.knopf) {
+  width: 100%;
+}
+
+.geschlossen {
+  margin: 0;
+  font-weight: 600;
 }
 
 .gruss {
@@ -118,33 +140,49 @@
   padding-bottom: 4rem;
 }
 
-@media (min-width: 40rem) {
-  .gelbInnen {
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    padding-block: 3rem 2.5rem;
+@media (min-width: 48rem) {
+  .hero {
+    width: min(100% - 2.5rem, var(--breit));
+    margin: 2rem auto 0;
+    border-radius: 1.25rem;
   }
 
-  .fakten {
-    grid-template-columns: repeat(3, auto);
-    justify-content: start;
-    gap: 0.5rem 2.5rem;
-    margin: 2rem 0;
+  .kopfband {
+    grid-template-columns: 1fr auto;
+    padding: 2rem 2.5rem 1.75rem;
+  }
+
+  .einladung {
+    font-size: 1.15rem;
   }
 
   .wappen {
     display: block;
-    width: clamp(110px, 18vw, 220px);
+    width: clamp(100px, 13vw, 150px);
     height: auto;
-    margin-bottom: -5.5rem;
-    position: relative;
-    z-index: 1;
+  }
+
+  .infoband {
+    padding: 1.5rem 2.5rem 2rem;
+  }
+
+  .fakten {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .fakt {
+    padding: 1rem 1.25rem;
+  }
+
+  .fakt + .fakt {
+    border-top: 0;
+    border-left: 1px solid var(--linie);
   }
 
   .aktionen {
     flex-direction: row;
     align-items: center;
-    gap: 1.25rem;
+    margin-top: 1.5rem;
   }
 
   .aktionen :global(.knopf) {

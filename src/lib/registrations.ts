@@ -6,6 +6,7 @@ import {
   registrationHelperRole,
   user,
   type EventRow,
+  type FoodChoice,
   type Gender,
   type PaymentStatus,
 } from "@/db/schema";
@@ -26,6 +27,8 @@ export type RegistrationDetails = {
   positions: string[];
   gender: Gender | null;
   insuranceAccepted: boolean;
+  foodChoice: FoodChoice | null;
+  drinkChoices: string[];
   paymentStatus: PaymentStatus;
   paymentState: PaymentState;
   paidAt: Date | null;
@@ -56,6 +59,8 @@ export async function saveParticipation(
     positions: input.playsTournament ? input.positions : [],
     gender: input.playsTournament && eventRow.genderEnabled ? input.gender : null,
     insuranceAccepted: input.playsTournament && input.insuranceAccepted,
+    foodChoice: input.foodChoice,
+    drinkChoices: [...new Set(input.drinkChoices)],
     updatedAt: new Date(),
   };
 
@@ -173,6 +178,8 @@ export async function listRegistrations(eventId: number, userId?: string): Promi
       positions: row.positions,
       gender: row.gender,
       insuranceAccepted: row.insuranceAccepted,
+      foodChoice: row.foodChoice,
+      drinkChoices: row.drinkChoices,
       paymentStatus: row.paymentStatus,
       paymentState,
       paidAt: row.paidAt,

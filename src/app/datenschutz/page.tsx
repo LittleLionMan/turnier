@@ -21,7 +21,8 @@ export default function PrivacyPage() {
         freiwillig deinen Spitznamen und den Zeitraum, in dem du im Verein aktiv warst. Wenn du am Turnier teilnimmst,
         kommen deine Positionen und gegebenenfalls dein Geschlecht dazu, außerdem deine Bestätigung des
         Versicherungshinweises. Wenn du mithilfst, speichern wir die gewählten Helferrollen. Für die Zahlung speichern
-        wir, ob und wann dein Beitrag eingegangen ist.
+        wir, ob und wann dein Beitrag eingegangen ist. Für den Einkauf zum Abendprogramm speichern wir freiwillig deine
+        Essens- und Getränkewünsche.
       </p>
 
       <h2>Wofür</h2>

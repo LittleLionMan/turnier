@@ -15,6 +15,13 @@
       "when": 1795028855640,
       "tag": "0001_payment_and_helper_limits",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795611377971,
+      "tag": "0002_evening_preferences",
+      "breakpoints": true
     }
   ]
 }
