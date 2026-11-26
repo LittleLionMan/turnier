@@ -17,7 +17,7 @@ function AdminDetails({ entry }: { entry: ProspectEntry }) {
     details.suggestedBy ? `Vorgeschlagen von ${details.suggestedBy}` : null,
     entry.status === "informiert"
       ? [
-          `Informiert von ${details.informedBy ?? "Unbekannt"}`,
+          details.informedBy ? `Informiert von ${details.informedBy}` : "Informiert",
           details.contactMethod ? contactMethodLabel(details.contactMethod) : null,
           details.contactNote ? `„${details.contactNote}“` : null,
         ]

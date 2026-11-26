@@ -4,8 +4,11 @@ import { and, eq, max } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/db";
-import { event, helperRole, registration, user } from "@/db/schema";
+import { contactMethodEnum, event, helperRole, prospect, registration, user } from "@/db/schema";
 import { getCurrentEvent } from "@/lib/event";
+import { normalizeName } from "@/lib/names";
+import { MAX_IMPORT_ROWS } from "@/lib/prospect-import";
+import { prospectNames } from "@/lib/prospects";
 import { requireAdmin } from "@/lib/session";
 import { errorState, readForm, type FormState } from "@/lib/validation";
 
@@ -162,4 +165,66 @@ export async function setHelperRoleActiveAction(roleId: number, active: boolean)
     .set({ active })
     .where(and(eq(helperRole.id, roleId), eq(helperRole.eventId, eventRow.id)));
   refresh();
+}
+
+const importRowsSchema = z
+  .array(
+    z.object({
+      name: z.string().trim().min(2).max(60),
+      hint: z.string().trim().max(120).nullable(),
+      informed: z.boolean(),
+      contactMethod: z.enum(contactMethodEnum.enumValues).nullable(),
+      contactNote: z.string().trim().max(200).nullable(),
+    }),
+  )
+  .min(1)
+  .max(MAX_IMPORT_ROWS);
+
+export async function importProspectsAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  const admin = await requireAdmin();
+  const raw = formData.get("rows");
+  let parsedJson: unknown;
+  try {
+    parsedJson = JSON.parse(typeof raw === "string" ? raw : "");
+  } catch {
+    return { status: "error", message: "Die Datei konnte nicht gelesen werden. Bitte lade sie noch einmal hoch." };
+  }
+  const parsed = importRowsSchema.safeParse(parsedJson);
+  if (!parsed.success) {
+    return { status: "error", message: "In der Vorschau ist etwas schiefgelaufen. Bitte lade die Datei noch einmal hoch." };
+  }
+
+  const eventRow = await getCurrentEvent();
+  const taken = new Set((await prospectNames(eventRow.id)).map(normalizeName));
+  const now = new Date();
+  const fresh = parsed.data.filter((row) => {
+    const key = normalizeName(row.name);
+    if (taken.has(key)) return false;
+    taken.add(key);
+    return true;
+  });
+
+  if (fresh.length > 0) {
+    await db.insert(prospect).values(
+      fresh.map((row) => ({
+        eventId: eventRow.id,
+        name: row.name,
+        hint: row.hint,
+        status: row.informed ? ("informiert" as const) : ("offen" as const),
+        suggestedById: admin.id,
+        contactMethod: row.informed ? row.contactMethod : null,
+        contactNote: row.informed ? row.contactNote : null,
+        informedAt: row.informed ? now : null,
+      })),
+    );
+  }
+
+  refresh();
+  const skipped = parsed.data.length - fresh.length;
+  return {
+    status: "success",
+    message: `${fresh.length} ${fresh.length === 1 ? "Eintrag" : "Einträge"} importiert.${
+      skipped > 0 ? ` ${skipped} übersprungen, weil sie inzwischen schon auf der Liste stehen.` : ""
+    }`,
+  };
 }
