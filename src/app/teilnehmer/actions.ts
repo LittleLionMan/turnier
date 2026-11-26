@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { contactMethodEnum, prospect } from "@/db/schema";
 import { getCurrentEvent } from "@/lib/event";
 import { notifyProspectInformed, notifyProspectSuggested } from "@/lib/notifications";
+import { normalizeName } from "@/lib/names";
 import { contactMethodLabel, findDuplicate, personName } from "@/lib/prospects";
 import { isAdminEmail, requireAdmin, requireUser } from "@/lib/session";
 import { errorState, readForm, type FormState } from "@/lib/validation";
@@ -199,4 +200,42 @@ export async function deleteProspectAction(prospectId: number): Promise<void> {
   const eventRow = await getCurrentEvent();
   await db.delete(prospect).where(and(eq(prospect.id, prospectId), eq(prospect.eventId, eventRow.id)));
   refresh();
+}
+
+export async function updateProspectAction(
+  prospectId: number,
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireAdmin();
+  const values = readForm(formData);
+  const parsed = suggestionSchema.safeParse(values);
+  if (!parsed.success) return errorState(parsed.error, values);
+
+  const eventRow = await getCurrentEvent();
+  const others = await db
+    .select({ id: prospect.id, name: prospect.name, hint: prospect.hint })
+    .from(prospect)
+    .where(eq(prospect.eventId, eventRow.id));
+  const conflict = others.find(
+    (entry) =>
+      entry.id !== prospectId &&
+      normalizeName(entry.name) === normalizeName(parsed.data.name) &&
+      normalizeName(entry.hint ?? "") === normalizeName(parsed.data.hint ?? ""),
+  );
+  if (conflict) {
+    return {
+      status: "error",
+      message: "Bitte prüfe die markierten Felder.",
+      fieldErrors: { hint: ["Einen Eintrag mit diesem Namen und dieser Zusatzinfo gibt es schon."] },
+      values,
+    };
+  }
+
+  await db
+    .update(prospect)
+    .set({ name: parsed.data.name, hint: parsed.data.hint })
+    .where(and(eq(prospect.id, prospectId), eq(prospect.eventId, eventRow.id)));
+  refresh();
+  return { status: "success", message: "Gespeichert." };
 }

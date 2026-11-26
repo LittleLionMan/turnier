@@ -144,8 +144,8 @@
 .aktionen {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.5rem 1rem;
 }
 
 .aktionen:empty {
@@ -156,20 +156,25 @@
   margin: 0;
 }
 
-.informieren {
+.informieren[open],
+.verwalten[open] {
   flex-basis: 100%;
 }
 
-.informieren summary {
+.informieren > summary,
+.verwalten > summary,
+.entfernen summary {
   list-style: none;
   cursor: pointer;
 }
 
-.informieren summary::-webkit-details-marker {
+.informieren > summary::-webkit-details-marker,
+.verwalten > summary::-webkit-details-marker,
+.entfernen summary::-webkit-details-marker {
   display: none;
 }
 
-.informieren[open] summary {
+.informieren[open] > summary {
   background: var(--kontur);
   color: var(--weiss);
 }
@@ -183,13 +188,66 @@
   border-left: 4px solid var(--gelb);
 }
 
+.verwalten > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--tinte-2);
+}
+
+.verwalten > summary::after {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-25%) rotate(45deg);
+}
+
+.verwalten[open] > summary {
+  color: var(--kontur);
+}
+
+.verwalten[open] > summary::after {
+  transform: translateY(25%) rotate(-135deg);
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.25rem;
+  padding: 1rem;
+  background: var(--flaeche);
+  border-left: 4px solid var(--kontur);
+}
+
+.panelForm {
+  display: grid;
+  gap: 1rem;
+}
+
+.panelAktionen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--linie);
+}
+
 .entfernen summary {
   display: inline-flex;
   align-items: center;
   min-height: 40px;
-  cursor: pointer;
   color: var(--rot-tief);
   font-weight: 600;
+}
+
+.entfernen[open] {
+  flex-basis: 100%;
 }
 
 .entfernen form {

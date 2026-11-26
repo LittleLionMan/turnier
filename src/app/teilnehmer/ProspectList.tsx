@@ -7,6 +7,7 @@ import {
   undoInformationAction,
   withdrawProspectAction,
 } from "./actions";
+import { ProspectAdminPanel } from "./ProspectAdminPanel";
 import { ProspectInformForm } from "./ProspectInformForm";
 import styles from "./page.module.css";
 
@@ -50,11 +51,12 @@ function AdminActions({ entry }: { entry: ProspectEntry }) {
             Ablehnen
           </button>
         </form>
+        <ProspectAdminPanel prospectId={entry.id} name={entry.name} hint={entry.hint} />
       </>
     );
   }
   return (
-    <>
+    <ProspectAdminPanel prospectId={entry.id} name={entry.name} hint={entry.hint}>
       <form action={markProspectRegisteredAction.bind(null, entry.id)}>
         <button type="submit" className="knopf knopf-zweit knopf-klein">
           Hat sich angemeldet
@@ -63,13 +65,13 @@ function AdminActions({ entry }: { entry: ProspectEntry }) {
       <details className={styles.entfernen}>
         <summary>Entfernen</summary>
         <form action={deleteProspectAction.bind(null, entry.id)}>
-          <p>„{entry.name}“ endgültig von der Liste löschen? Das zählt nicht als angemeldet.</p>
+          <p>„{entry.name}“ endgültig löschen? Das zählt nicht als angemeldet.</p>
           <button type="submit" className="knopf knopf-gefahr knopf-klein">
             Endgültig löschen
           </button>
         </form>
       </details>
-    </>
+    </ProspectAdminPanel>
   );
 }
 
