@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { count, eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { Gallery } from "@/components/Gallery";
 import { NavIcon } from "@/components/NavIcon";
 import { SharePanel } from "@/components/SharePanel";
@@ -25,7 +25,9 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const [eventRow, user, photos] = await Promise.all([getCurrentEvent(), getSessionUser(), listPhotos()]);
   const [{ value: registered }] = await db
-    .select({ value: count() })
+    .select({
+      value: sql<number>`coalesce(sum(1 + ${registration.guestAdults} + ${registration.guestChildren}), 0)::int`,
+    })
     .from(registration)
     .where(eq(registration.eventId, eventRow.id));
   const deadline = registrationDeadline(eventRow);

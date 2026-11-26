@@ -40,11 +40,11 @@ export default async function ParticipantsPage() {
 
       <dl className={styles.zahlen}>
         <div>
-          <dt>Angemeldet</dt>
+          <dt>Anmeldungen</dt>
           <dd>{entries.length}</dd>
         </div>
         <div>
-          <dt>Mit Begleitung</dt>
+          <dt>Teilnehmer</dt>
           <dd>{people}</dd>
         </div>
         <div>

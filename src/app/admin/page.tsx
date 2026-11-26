@@ -110,7 +110,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <dd>{entries.length}</dd>
           </div>
           <div>
-            <dt>Personen mit Begleitung</dt>
+            <dt>Teilnehmer</dt>
             <dd>{totalPeople}</dd>
           </div>
           <div>
