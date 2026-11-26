@@ -4,6 +4,7 @@ import { POSITIONS } from "@/lib/constants";
 import { eveningSummary, type ShoppingLine } from "@/lib/evening";
 import { formatFee, fullName, getCurrentEvent, getHelperRoles, paymentCode } from "@/lib/event";
 import { listPhotos } from "@/lib/photos";
+import { prospectCounts } from "@/lib/prospects";
 import { amountDue, headcount, listRegistrations, type PaymentState } from "@/lib/registrations";
 import { requireAdmin } from "@/lib/session";
 import { deleteRegistrationAction, setHelperRoleActiveAction, setPaymentStatusAction } from "./actions";
@@ -84,10 +85,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const filter: Filter = status === "offen" || status === "bezahlt" || status === "befreit" ? status : "alle";
 
   const eventRow = await getCurrentEvent();
-  const [entries, helperRoles, photos] = await Promise.all([
+  const [entries, helperRoles, photos, prospects] = await Promise.all([
     listRegistrations(eventRow.id),
     getHelperRoles(eventRow.id, false),
     listPhotos(),
+    prospectCounts(eventRow.id),
   ]);
   const paid = entries.filter((entry) => entry.paymentState === "bezahlt");
   const exempt = entries.filter((entry) => entry.paymentState === "befreit");
@@ -129,7 +131,21 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <dt>Eingenommen</dt>
             <dd>{formatFee(collectedCents)}</dd>
           </div>
+          <div>
+            <dt>Über die Liste gewonnen</dt>
+            <dd>{prospects.recruited}</dd>
+          </div>
         </dl>
+        {prospects.pending > 0 && (
+          <div className="hinweis">
+            <p>
+              {prospects.pending === 1
+                ? "Ein Vorschlag wartet auf Freigabe."
+                : `${prospects.pending} Vorschläge warten auf Freigabe.`}{" "}
+              <Link href="/teilnehmer#ehemalige">Zur Liste</Link>
+            </p>
+          </div>
+        )}
         <div className={styles.verteilung}>
           <div>
             <h3>Spieler nach Position ({players.length})</h3>

@@ -32,6 +32,13 @@ export const DRINK_OPTIONS = [
   { value: "alkoholfrei", label: "Alkoholfrei" },
 ] as const;
 
+export const CONTACT_METHODS = [
+  { value: "anruf", label: "Angerufen" },
+  { value: "nachricht", label: "WhatsApp/Nachricht" },
+  { value: "persoenlich", label: "Persönlich" },
+  { value: "social_media", label: "Social Media" },
+] as const;
+
 export type DrinkChoice = (typeof DRINK_OPTIONS)[number]["value"];
 
 export const DEFAULT_FOOD = "fleisch";

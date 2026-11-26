@@ -98,6 +98,25 @@ export const genderEnum = pgEnum("gender", ["weiblich", "maennlich", "divers"]);
 export const paymentStatusEnum = pgEnum("payment_status", ["offen", "bezahlt"]);
 export const foodChoiceEnum = pgEnum("food_choice", ["fleisch", "vegetarisch", "vegan"]);
 
+export const prospectStatusEnum = pgEnum("prospect_status", ["vorgeschlagen", "offen", "informiert", "angemeldet"]);
+export const contactMethodEnum = pgEnum("contact_method", ["anruf", "nachricht", "persoenlich", "social_media"]);
+
+export const prospect = pgTable("prospect", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id")
+    .notNull()
+    .references(() => event.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  hint: text("hint"),
+  status: prospectStatusEnum("status").notNull().default("vorgeschlagen"),
+  suggestedById: text("suggested_by_id").references(() => user.id, { onDelete: "set null" }),
+  informedById: text("informed_by_id").references(() => user.id, { onDelete: "set null" }),
+  contactMethod: contactMethodEnum("contact_method"),
+  contactNote: text("contact_note"),
+  informedAt: timestamp("informed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const registration = pgTable(
   "registration",
   {
@@ -176,6 +195,8 @@ export const registrationHelperRoleRelations = relations(registrationHelperRole,
 export type Gender = (typeof genderEnum.enumValues)[number];
 export type PaymentStatus = (typeof paymentStatusEnum.enumValues)[number];
 export type FoodChoice = (typeof foodChoiceEnum.enumValues)[number];
+export type ProspectStatus = (typeof prospectStatusEnum.enumValues)[number];
+export type ContactMethod = (typeof contactMethodEnum.enumValues)[number];
 export type EventRow = typeof event.$inferSelect;
 export type RegistrationRow = typeof registration.$inferSelect;
 export type HelperRoleRow = typeof helperRole.$inferSelect;

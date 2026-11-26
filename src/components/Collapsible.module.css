@@ -1,0 +1,50 @@
+.klappe > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 48px;
+  padding: 0.6rem 0;
+  border-top: 3px solid var(--kontur);
+  border-bottom: 1px solid var(--linie);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.klappe > summary::-webkit-details-marker {
+  display: none;
+}
+
+.klappe > summary::after {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  border-right: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: translateY(-25%) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.klappe[open] > summary {
+  border-bottom-color: transparent;
+}
+
+.klappe[open] > summary::after {
+  transform: translateY(25%) rotate(-135deg);
+}
+
+.klappe > summary:focus-visible {
+  outline: 3px solid var(--gelb);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .klappe > summary::after {
+    transition: none;
+  }
+}
+
+.klappe > summary + * {
+  border-top-width: 1px;
+}

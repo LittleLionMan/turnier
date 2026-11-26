@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { YearChart } from "@/components/YearChart";
+import { Collapsible } from "@/components/Collapsible";
 import { displayName, formatYearRanges, getCurrentEvent } from "@/lib/event";
-import { activeYearDistribution, headcount, listRegistrations, peakPeriods } from "@/lib/registrations";
+import { knownNames, listProspects, prospectCounts } from "@/lib/prospects";
+import {
+  activeYearDistribution,
+  headcount,
+  listRegistrations,
+  peakPeriods,
+  type RegistrationDetails,
+} from "@/lib/registrations";
+import { getSessionUser, isAdminEmail } from "@/lib/session";
+import { ProspectList } from "./ProspectList";
+import { ProspectSuggestForm } from "./ProspectSuggestForm";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = { title: "Wer ist dabei?" };
 export const dynamic = "force-dynamic";
+const COLLAPSE_FROM = 10;
 
 function activePeriod(from: number | null, to: number | null): string {
   if (from === null) return "";
@@ -23,9 +35,48 @@ function peakSentence(count: number, ranges: { from: number; to: number }[]): st
   return `Am stärksten vertreten sind die Jahre ${formatYearRanges(ranges)}: Da waren jeweils ${people} von uns aktiv.`;
 }
 
+function RegistrationList({ entries }: { entries: RegistrationDetails[] }) {
+  return (
+    <ul className={styles.liste}>
+      {entries.map((entry) => (
+        <li key={entry.id} className={entry.showPublicly ? undefined : styles.anonym}>
+          <span className={styles.name}>
+            {entry.showPublicly ? displayName(entry.firstName, entry.nickname) : "Anonym"}
+          </span>
+          <span className={styles.zeit}>
+            {entry.showPublicly ? activePeriod(entry.activeFrom, entry.activeTo) : ""}
+          </span>
+          <span className={styles.rollen}>
+            {entry.playsTournament && <span className="marke marke-gelb">spielt mit</span>}
+            {entry.guestAdults + entry.guestChildren > 0 && (
+              <span className="marke">+{entry.guestAdults + entry.guestChildren} Begleitung</span>
+            )}
+            {entry.helperRoleLabels.map((label) => (
+              <span key={label} className="marke">
+                {label}
+              </span>
+            ))}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function recruitedSentence(recruited: number): string {
+  return recruited === 1
+    ? "Eine Person hat sich schon über diese Liste angemeldet."
+    : `${recruited} Leute haben sich schon über diese Liste angemeldet.`;
+}
+
 export default async function ParticipantsPage() {
-  const eventRow = await getCurrentEvent();
+  const [eventRow, sessionUser] = await Promise.all([getCurrentEvent(), getSessionUser()]);
   const entries = await listRegistrations(eventRow.id);
+  const viewer = sessionUser ? { id: sessionUser.id, isAdmin: isAdminEmail(sessionUser.email) } : null;
+  const prospects = viewer ? await listProspects(eventRow.id, viewer) : [];
+  const [names, counts] = viewer
+    ? await Promise.all([knownNames(eventRow.id, prospects, viewer), prospectCounts(eventRow.id)])
+    : [[], { recruited: 0, pending: 0 }];
   const currentYear = new Date().getFullYear();
   const distribution = activeYearDistribution(entries, currentYear);
   const players = entries.filter((entry) => entry.playsTournament).length;
@@ -69,30 +120,32 @@ export default async function ParticipantsPage() {
           <p className="lead">
             Noch niemand da. <Link href="/anmelden">Sei die oder der Erste.</Link>
           </p>
+        ) : newestFirst.length >= COLLAPSE_FROM ? (
+          <Collapsible summary={`${newestFirst.length} Anmeldungen`}>
+            <RegistrationList entries={newestFirst} />
+          </Collapsible>
         ) : (
-          <ul className={styles.liste}>
-            {newestFirst.map((entry) => (
-              <li key={entry.id} className={entry.showPublicly ? undefined : styles.anonym}>
-                <span className={styles.name}>
-                  {entry.showPublicly ? displayName(entry.firstName, entry.nickname) : "Anonym"}
-                </span>
-                <span className={styles.zeit}>
-                  {entry.showPublicly ? activePeriod(entry.activeFrom, entry.activeTo) : ""}
-                </span>
-                <span className={styles.rollen}>
-                  {entry.playsTournament && <span className="marke marke-gelb">spielt mit</span>}
-                  {entry.guestAdults + entry.guestChildren > 0 && (
-                    <span className="marke">+{entry.guestAdults + entry.guestChildren} Begleitung</span>
-                  )}
-                  {entry.helperRoleLabels.map((label) => (
-                    <span key={label} className="marke">
-                      {label}
-                    </span>
-                  ))}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <RegistrationList entries={newestFirst} />
+        )}
+      </section>
+      <section className={styles.abschnitt} aria-labelledby="ehemalige">
+        <h2 id="ehemalige">An wen müssen wir unbedingt noch denken?</h2>
+        {viewer ? (
+          <>
+            <p className="lead">
+              Von vielen Ehemaligen haben wir keine Kontaktdaten mehr. Schlag vor, wer fehlt, und sag Bescheid, wenn du
+              jemanden von der Liste erreicht hast. So schreibt niemand doppelt und niemand wird vergessen.
+            </p>
+            {counts.recruited > 0 && <p className={styles.erfolg}>{recruitedSentence(counts.recruited)}</p>}
+            <ProspectList entries={prospects} />
+            <h3 className={styles.unterTitel}>Jemand fehlt?</h3>
+            <ProspectSuggestForm knownNames={names} isAdmin={viewer.isAdmin} />
+          </>
+        ) : (
+          <p className="lead">
+            Wir sammeln gemeinsam, welche Ehemaligen wir noch nicht erreicht haben. Die Liste siehst du, sobald du{" "}
+            <Link href="/login">eingeloggt</Link> bist. Noch nicht dabei? <Link href="/anmelden">Hier anmelden.</Link>
+          </p>
         )}
       </section>
     </div>

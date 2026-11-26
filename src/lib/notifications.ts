@@ -42,3 +42,30 @@ export async function notifyNewRegistration(eventId: number, entry: Registration
 
   await sendTelegram(lines.join("\n"));
 }
+
+export async function notifyProspectSuggested(name: string, hint: string | null, suggestedBy: string): Promise<void> {
+  const lines = [
+    "💡 <b>Neuer Vorschlag für die Liste</b>",
+    "",
+    `<b>${escapeHtml(name)}</b>${hint ? ` – ${escapeHtml(hint)}` : ""}`,
+    `Vorgeschlagen von ${escapeHtml(suggestedBy)}`,
+    "",
+    `<a href="${appUrl("/teilnehmer#ehemalige")}">Zur Freigabe</a>`,
+  ];
+  await sendTelegram(lines.join("\n"));
+}
+
+export async function notifyProspectInformed(
+  name: string,
+  informedBy: string,
+  method: string,
+  note: string | null,
+): Promise<void> {
+  const lines = [
+    `📣 <b>${escapeHtml(name)}</b> wurde informiert`,
+    "",
+    `Von: ${escapeHtml(informedBy)}`,
+    `Wie: ${escapeHtml(method)}${note ? ` (${escapeHtml(note)})` : ""}`,
+  ];
+  await sendTelegram(lines.join("\n"));
+}
