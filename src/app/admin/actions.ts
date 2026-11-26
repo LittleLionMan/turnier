@@ -6,9 +6,8 @@ import { z } from "zod";
 import { db } from "@/db";
 import { contactMethodEnum, event, helperRole, prospect, registration, user } from "@/db/schema";
 import { getCurrentEvent } from "@/lib/event";
-import { normalizeName } from "@/lib/names";
-import { MAX_IMPORT_ROWS } from "@/lib/prospect-import";
-import { prospectNames } from "@/lib/prospects";
+import { isSameProspect, MAX_IMPORT_ROWS } from "@/lib/prospect-import";
+import { prospectNamesAndHints } from "@/lib/prospects";
 import { requireAdmin } from "@/lib/session";
 import { errorState, readForm, type FormState } from "@/lib/validation";
 
@@ -195,12 +194,11 @@ export async function importProspectsAction(_previous: FormState, formData: Form
   }
 
   const eventRow = await getCurrentEvent();
-  const taken = new Set((await prospectNames(eventRow.id)).map(normalizeName));
+  const taken = await prospectNamesAndHints(eventRow.id);
   const now = new Date();
   const fresh = parsed.data.filter((row) => {
-    const key = normalizeName(row.name);
-    if (taken.has(key)) return false;
-    taken.add(key);
+    if (taken.some((entry) => isSameProspect(row, entry))) return false;
+    taken.push(row);
     return true;
   });
 

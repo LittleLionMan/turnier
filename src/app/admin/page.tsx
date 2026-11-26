@@ -4,7 +4,7 @@ import { POSITIONS } from "@/lib/constants";
 import { eveningSummary, type ShoppingLine } from "@/lib/evening";
 import { formatFee, fullName, getCurrentEvent, getHelperRoles, paymentCode } from "@/lib/event";
 import { listPhotos } from "@/lib/photos";
-import { prospectCounts, prospectNames } from "@/lib/prospects";
+import { prospectCounts, prospectNamesAndHints } from "@/lib/prospects";
 import { amountDue, headcount, listRegistrations, type PaymentState } from "@/lib/registrations";
 import { requireAdmin } from "@/lib/session";
 import { deleteRegistrationAction, setHelperRoleActiveAction, setPaymentStatusAction } from "./actions";
@@ -86,12 +86,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const filter: Filter = status === "offen" || status === "bezahlt" || status === "befreit" ? status : "alle";
 
   const eventRow = await getCurrentEvent();
-  const [entries, helperRoles, photos, prospects, existingProspectNames] = await Promise.all([
+  const [entries, helperRoles, photos, prospects, existingProspects] = await Promise.all([
     listRegistrations(eventRow.id),
     getHelperRoles(eventRow.id, false),
     listPhotos(),
     prospectCounts(eventRow.id),
-    prospectNames(eventRow.id),
+    prospectNamesAndHints(eventRow.id),
   ]);
   const paid = entries.filter((entry) => entry.paymentState === "bezahlt");
   const exempt = entries.filter((entry) => entry.paymentState === "befreit");
@@ -357,7 +357,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
       <section className={styles.abschnitt} aria-labelledby="import-titel">
         <h2 id="import-titel">Ehemaligen-Liste importieren</h2>
-        <ProspectImport existingNames={existingProspectNames} />
+        <ProspectImport existing={existingProspects} />
       </section>
 
       <section className={`${styles.abschnitt} ${styles.schmal}`} aria-labelledby="fotos-titel">

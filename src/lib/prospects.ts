@@ -137,7 +137,6 @@ export async function prospectCounts(eventId: number): Promise<{ recruited: numb
   return { recruited: totalFor("angemeldet"), pending: totalFor("vorgeschlagen") };
 }
 
-export async function prospectNames(eventId: number): Promise<string[]> {
-  const rows = await db.select({ name: prospect.name }).from(prospect).where(eq(prospect.eventId, eventId));
-  return rows.map((row) => row.name);
+export async function prospectNamesAndHints(eventId: number): Promise<{ name: string; hint: string | null }[]> {
+  return db.select({ name: prospect.name, hint: prospect.hint }).from(prospect).where(eq(prospect.eventId, eventId));
 }

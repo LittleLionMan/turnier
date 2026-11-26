@@ -13,6 +13,11 @@ export type ImportRow = {
 
 export type ImportProblem = "name-fehlt" | "name-zu-lang" | "schon-auf-liste" | "doppelt-in-datei";
 
+export type NameAndHint = {
+  name: string;
+  hint: string | null;
+};
+
 export type PreviewRow = {
   line: number;
   row: ImportRow;
@@ -114,11 +119,16 @@ function toRow(cells: string[]): ImportRow {
   };
 }
 
-export function previewImport(text: string, existingNames: string[]): PreviewRow[] {
+export function isSameProspect(candidate: NameAndHint, existing: NameAndHint): boolean {
+  if (normalizeName(candidate.name) !== normalizeName(existing.name)) return false;
+  const hint = normalizeName(candidate.hint ?? "");
+  return hint === "" || hint === normalizeName(existing.hint ?? "");
+}
+
+export function previewImport(text: string, existing: NameAndHint[]): PreviewRow[] {
   const rows = parseCsv(text);
   const startsWithHeader = rows.length > 0 && isHeader(rows[0]);
-  const existing = new Set(existingNames.map(normalizeName));
-  const seen = new Set<string>();
+  const seen: NameAndHint[] = [];
 
   return rows.slice(startsWithHeader ? 1 : 0, (startsWithHeader ? 1 : 0) + MAX_IMPORT_ROWS).map((cells, index) => {
     const row = toRow(cells);
@@ -128,12 +138,12 @@ export function previewImport(text: string, existingNames: string[]): PreviewRow
         ? "name-fehlt"
         : row.name.length > 60
           ? "name-zu-lang"
-          : existing.has(key)
+          : existing.some((entry) => isSameProspect(row, entry))
             ? "schon-auf-liste"
-            : seen.has(key)
+            : seen.some((entry) => isSameProspect(row, entry))
               ? "doppelt-in-datei"
               : null;
-    seen.add(key);
+    seen.push(row);
     return { line: index + (startsWithHeader ? 2 : 1), row, problem };
   });
 }

@@ -3,7 +3,14 @@
 import { useActionState, useState } from "react";
 import { FormMessage, SubmitButton } from "@/components/form-bits";
 import { CONTACT_METHODS } from "@/lib/constants";
-import { decodeCsv, IMPORT_TEMPLATE, previewImport, type ImportProblem, type PreviewRow } from "@/lib/prospect-import";
+import {
+  decodeCsv,
+  IMPORT_TEMPLATE,
+  previewImport,
+  type ImportProblem,
+  type NameAndHint,
+  type PreviewRow,
+} from "@/lib/prospect-import";
 import type { FormState } from "@/lib/validation";
 import { importProspectsAction } from "./actions";
 import styles from "./page.module.css";
@@ -11,8 +18,8 @@ import styles from "./page.module.css";
 const PROBLEM_LABELS: Record<ImportProblem, string> = {
   "name-fehlt": "Name fehlt",
   "name-zu-lang": "Name zu lang (max. 60 Zeichen)",
-  "schon-auf-liste": "Steht schon auf der Liste",
-  "doppelt-in-datei": "Doppelt in der Datei",
+  "schon-auf-liste": "Steht schon auf der Liste (gleiche oder keine Zusatzinfo)",
+  "doppelt-in-datei": "Doppelt in der Datei (gleiche oder keine Zusatzinfo)",
 };
 
 const TEMPLATE_HREF = `data:text/csv;charset=utf-8,${encodeURIComponent(`\uFEFF${IMPORT_TEMPLATE}`)}`;
@@ -24,7 +31,7 @@ function statusText(entry: PreviewRow): string {
   return method ? `Neu, informiert (${method})` : "Neu, informiert";
 }
 
-export function ProspectImport({ existingNames }: { existingNames: string[] }) {
+export function ProspectImport({ existing }: { existing: NameAndHint[] }) {
   const [preview, setPreview] = useState<PreviewRow[] | null>(null);
   const [fileKey, setFileKey] = useState(0);
   const [state, formAction] = useActionState(async (previous: FormState, formData: FormData) => {
@@ -44,7 +51,7 @@ export function ProspectImport({ existingNames }: { existingNames: string[] }) {
       setPreview(null);
       return;
     }
-    setPreview(previewImport(decodeCsv(await file.arrayBuffer()), existingNames));
+        setPreview(previewImport(decodeCsv(await file.arrayBuffer()), existing));
   }
 
   return (
